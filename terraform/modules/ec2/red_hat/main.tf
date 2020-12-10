@@ -1,5 +1,10 @@
-data "aws_availability_zones" "available" {
-  state = "available"
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "~> 3.0"
+    }
+  }
 }
 
 data "aws_ami" "Red_Hat" {
@@ -11,11 +16,11 @@ data "aws_ami" "Red_Hat" {
   }
 }
 
-resource "aws_instance" "web" {
+resource "aws_instance" "main" {
   ami = data.aws_ami.Red_Hat.id
-  instance_type = "t2.micro"
-  subnet_id = aws_subnet.main.id
+  instance_type = var.instance_type
+  subnet_id = var.subnet_id
   tags = {
-    Name = "Webserver"
+    Name = var.name
   }
 }
