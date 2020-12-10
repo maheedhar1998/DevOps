@@ -1,9 +1,14 @@
+provider "aws" {
+  region = "us-east-1"
+  shared_credentials_file = "/home/maheedharm/.aws/credentials"
+  profile = "default"
+}
 module "Dev" {
-    source = "./"
+    source = "./modules"
 }
 module "Prod" {
-    source = "./"
+    source = "./modules"
 }
 module "QA" {
-    source = "./"
+    source = "./modules"
 }
