@@ -8,8 +8,24 @@ module "VPC" {
   source = "./modules/vpc"
   vpc_name = var.vpc_names
   cidr_block = var.vpc_CIDRs
-  subnet_cidr_block = var.vpc_subnet_CIDRs
 }
-# module "subnet" {
+
+module "subnet" {
+  source = "./modules/subnets"
+  # vpc_id = VPC.aws_vpc.
+}
+
+module "ec2" {
+  source = "./modules/ec2"
+
+}
+
+# module "s3" {
+#   source = "./modules/s3"
+
+# }
+
+# module "load_balancer" {
+#   source = "./modules/load_balancer"
 
 # }
