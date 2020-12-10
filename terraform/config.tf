@@ -1,9 +1,9 @@
 module "Dev" {
-    source = "./environments/Dev"
+    source = "./"
 }
 module "Prod" {
-    source = "./environments/Prod"
+    source = "./"
 }
 module "QA" {
-    source = "./environments/QA"
+    source = "./"
 }
