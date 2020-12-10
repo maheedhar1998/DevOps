@@ -4,11 +4,11 @@ provider "aws" {
   profile = "default"
 }
 module "Dev" {
-    source = "./modules"
+    source = "./modules/environments/"
 }
-module "Prod" {
-    source = "./modules"
-}
-module "QA" {
-    source = "./modules"
-}
+# module "Prod" {
+#     source = "./modules"
+# }
+# module "QA" {
+#     source = "./modules"
+# }

@@ -1,0 +1,31 @@
+Vagrant.configure("2") do |config|
+  config.vm.network "forwarded_port", guest: 22, host: 2222, auto_correct:true
+  config.vm.define "LB_haProxy" do |cust|
+    cust.vm.box = "bento/centos-8"
+    cust.vm.hostname = "VM-LB-HAPROXY"
+    cust.vm.network "private_network", ip: "192.168.69.69"
+    cust.ssh.insert_key = true
+    cust.vm.provision "file", source: "~/.ssh/id_rsa_vagrant.pub", destination: "~/.ssh/authorized_keys"
+  end
+  config.vm.define "nginx_target_1" do |n1|
+    n1.vm.box = "bento/centos-8"
+    n1.vm.hostname = "VM-NGINX-1"
+    n1.vm.network "private_network", ip: "192.168.25.25"
+    n1.ssh.insert_key = true
+    n1.vm.provision "file", source: "~/.ssh/id_rsa_vagrant.pub", destination: "~/.ssh/authorized_keys"
+  end
+  config.vm.define "nginx_target_2" do |n2|
+    n2.vm.box = "bento/centos-8"
+    n2.vm.hostname = "VM-NGINX-2"
+    n2.vm.network "private_network", ip: "192.168.50.50"
+    n2.ssh.insert_key = true
+    n2.vm.provision "file", source: "~/.ssh/id_rsa_vagrant.pub", destination: "~/.ssh/authorized_keys"
+  end
+  config.vm.define "nginx_target_3" do |n3|
+    n3.vm.box = "bento/centos-8"
+    n3.vm.hostname = "VM-NGINX-3"
+    n3.vm.network "private_network", ip: "192.168.75.75"
+    n3.ssh.insert_key = true
+    n3.vm.provision "file", source: "~/.ssh/id_rsa_vagrant.pub", destination: "~/.ssh/authorized_keys"
+  end
+end

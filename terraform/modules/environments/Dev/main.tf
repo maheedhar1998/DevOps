@@ -12,13 +12,15 @@ module "VPC" {
 
 module "subnet" {
   source = "./modules/subnets"
-  # vpc_id = VPC.aws_vpc.
+  vpc_id = module.VPC.aws_vpc.vpc_id
+  subnet_cidr_block = var.subnet_cidr_block
+  name = var.subnet_name
 }
 
-module "ec2" {
-  source = "./modules/ec2"
+# module "ec2" {
+#   source = "./modules/ec2"
 
-}
+# }
 
 # module "s3" {
 #   source = "./modules/s3"
