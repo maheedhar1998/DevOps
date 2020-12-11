@@ -27,7 +27,7 @@ module "subnet_2" {
 module "ec2" {
   source = "../../modules/ec2/red_hat"
   subnet_id = module.subnet_1.subnet_id
-  name = "My WebServer"
+  name = "My WebServer QA"
   instance_type = "t2.micro"
 }
 

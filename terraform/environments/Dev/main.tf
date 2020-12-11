@@ -27,7 +27,7 @@ module "subnet_2" {
 module "ec2" {
   source = "../../modules/ec2/red_hat"
   subnet_id = module.subnet_1.subnet_id
-  name = "My WebServer"
+  name = "My WebServer Dev"
   instance_type = "t2.micro"
 }
 
@@ -37,6 +37,10 @@ module "s3" {
   acl = "private"
   name = "My bucket for ALB Logs"
 }
+
+# module "ig" {
+#   source = "../../modules/internet"
+# }
 
 module "load_balancer" {
   source = "../../modules/load_balancer"
