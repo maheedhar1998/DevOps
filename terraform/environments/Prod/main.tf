@@ -10,7 +10,7 @@ module "VPC" {
   cidr_block = "10.12.0.0/16"
 }
 
-module "subnet" {
+module "subnet_1" {
   source = "../../modules/subnet"
   vpc_id = module.VPC.vpc_id
   subnet_cidr_block = "10.12.1.0/24"
@@ -34,8 +34,14 @@ module "ec2" {
 module "s3" {
   source = "../../modules/s3"
   bucket = "my-load-balancer-logs-bucket-prod"
-  acl = "private"
+  acl = "public-read-write"
   name = "My bucket for ALB Logs"
+}
+
+module "ig" {
+  source = "../../modules/internet_gateway"
+  vpc_id = module.VPC.vpc_id
+  name = "internet-gateway-prod"
 }
 
 module "load_balancer" {

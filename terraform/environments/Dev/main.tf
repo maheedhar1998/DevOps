@@ -17,11 +17,53 @@ module "subnet_1" {
   name = "Main 10.11.1.0/24 ${module.VPC.vpc_id}"
 }
 
+module "route_table_sub_1" {
+  source = "../../modules/route_table"
+  name = "Public Subnet Route Table"
+  vpc_id = module.VPC.vpc_id
+}
+
+module "route_1_sub1" {
+  source = "../../modules/route"
+  route_table_id = module.route_table_sub_1.route_table_id
+  nat = false
+  dest_cidr = "0.0.0.0/0"
+  gateway_id = module.ig.internet_gateway_id
+}
+
+module "route_table_sub_1_association" {
+  source = "../../modules/route_table_association"
+  sub = true
+  subnet_id = module.subnet_1.subnet_id
+  route_table_id = module.route_table_sub_1.route_table_id
+}
+
 module "subnet_2" {
   source = "../../modules/subnet"
   vpc_id = module.VPC.vpc_id
   subnet_cidr_block = "10.11.2.0/24"
   name = "Main 10.11.2.0/24 ${module.VPC.vpc_id}"
+}
+
+module "route_table_sub_2" {
+  source = "../../modules/route_table"
+  name = "Private Subnet Route Table"
+  vpc_id = module.VPC.vpc_id
+}
+
+module "route_1_sub2" {
+  source = "../../modules/route"
+  route_table_id = module.route_table_sub_1.route_table_id
+  nat = true
+  dest_cidr = "0.0.0.0/0"
+  nat_gateway_id = # TODO NAT Gateway
+}
+
+module "route_table_sub_2_association" {
+  source = "../../modules/route_table_association"
+  sub = true
+  subnet_id = module.subnet_2.subnet_id
+  route_table_id = module.route_table_sub_2.route_table_id
 }
 
 module "ec2" {
@@ -34,13 +76,17 @@ module "ec2" {
 module "s3" {
   source = "../../modules/s3"
   bucket = "my-load-balancer-logs-bucket-dev"
-  acl = "private"
+  acl = "public-read-write"
   name = "My bucket for ALB Logs"
 }
 
-# module "ig" {
-#   source = "../../modules/internet"
-# }
+module "ig" {
+  source = "../../modules/internet_gateway"
+  vpc_id = module.VPC.vpc_id
+  name = "internet-gateway-dev"
+}
+
+
 
 module "load_balancer" {
   source = "../../modules/load_balancer"
