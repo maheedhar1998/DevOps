@@ -56,7 +56,7 @@ module "route_1_sub2" {
   route_table_id = module.route_table_sub_1.route_table_id
   nat = true
   dest_cidr = "0.0.0.0/0"
-  nat_gateway_id = # TODO NAT Gateway
+  nat_gateway_id = module.nat_gateway.nat_gateway_id
 }
 
 module "route_table_sub_2_association" {
@@ -86,7 +86,18 @@ module "ig" {
   name = "internet-gateway-dev"
 }
 
+module "elastic_ip" {
+  source = "../../modules/elastic_ip"
+  name = "NAT Gateway Elastic IP"
+  network_interface_id = ""# TODO Network Interfaces
+}
 
+module "nat_gateway" {
+  source = "../../modules/nat_gateway"
+  name = "NAT Gateway Dev"
+  eip_id = module.elastic_ip.id
+  subnet_id = module.subnet_1.subnet_id
+}
 
 module "load_balancer" {
   source = "../../modules/load_balancer"
