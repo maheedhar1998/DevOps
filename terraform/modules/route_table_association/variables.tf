@@ -8,7 +8,7 @@ variable "subnet_id" {
 }
 variable "gateway_id" {
   type = string
-  descdescription = "The ID of the gateway to associate with"
+  description = "The ID of the gateway to associate with"
 }
 variable "route_table_id" {
   type = string

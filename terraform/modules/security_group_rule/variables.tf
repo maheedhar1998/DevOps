@@ -3,11 +3,11 @@ variable "type" {
   description = "The Type of Security Group Rule"
 }
 variable "from_port" {
-  type = string
+  type = number
   description = "The From Port for the Security Group Rule"
 }
 variable "to_port" {
-  type = string
+  type = number
   description = "The To Port for the Security Group Rule"
 }
 variable "protocol" {

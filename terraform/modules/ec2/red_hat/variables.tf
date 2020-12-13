@@ -10,3 +10,7 @@ variable "instance_type" {
     type =  string
     description = "Type of ec2 instance"
 }
+variable "vpc_security_group_ids" {
+    type = list(string)
+    description = "Security Groups in VPC to associate the EC2 instances with"
+}
