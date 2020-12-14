@@ -21,6 +21,7 @@ module "security_group_sub1" {
   source = "../../modules/security_group"
   description = "public-security-group"
   vpc_id = module.VPC.vpc_id
+  name = "public-security-group"
 }
 
 module "security_group_1_rule_1" {
@@ -45,6 +46,24 @@ module "security_group_1_rule_2" {
   security_group_id = module.security_group_sub1.security_group_id
   cidr_blocks = "0.0.0.0/0"
   ipv6_cidr_blocks = "::/0"
+}
+
+module "security_group_bastion" {
+  source = "../../modules/security_group"
+  description = "Bastion Security Group"
+  vpc_id = module.VPC.vpc_id
+  name = "bastion-sg"
+}
+
+module "bastion_sg_rule_1" {
+  source = "../../modules/security_group_rule"
+  source_sg = false
+  type = "ingress"
+  from_port = 22
+  to_port = 22
+  protocol = "tcp"
+  security_group_id = module.security_group_bastion.security_group_id
+  cidr_blocks = "98.25.199.67/32"
 }
 
 module "route_table_sub_1" {
@@ -79,6 +98,7 @@ module "security_group_sub2" {
   source = "../../modules/security_group"
   description = "private-security-group"
   vpc_id = module.VPC.vpc_id
+  name = "private-sg"
 }
 
 module "security_group_2_rule_1" {
@@ -113,12 +133,20 @@ module "route_table_sub_2_association" {
   route_table_id = module.route_table_sub_2.route_table_id
 }
 
+module "ec2_bastion" {
+  source = "../../modules/ec2/red_hat"
+  subnet_id = module.subnet_1.subnet_id
+  name = "My Bastion Host"
+  instance_type = "t2.micro"
+  vpc_security_group_ids = [module.security_group_bastion.security_group_id]
+}
+
 module "ec2_0" {
   source = "../../modules/ec2/red_hat"
   subnet_id = module.subnet_2.subnet_id
   name = "My WebServer Dev 1"
   instance_type = "t2.micro"
-  vpc_security_group_ids = []
+  vpc_security_group_ids = [module.security_group_sub2.security_group_id]
 }
 
 module "ec2_1" {
@@ -126,7 +154,7 @@ module "ec2_1" {
   subnet_id = module.subnet_2.subnet_id
   name = "My WebServer Dev 2"
   instance_type = "t2.micro"
-  vpc_security_group_ids = []
+  vpc_security_group_ids = [module.security_group_sub2.security_group_id]
 }
 
 module "ec2_2" {
@@ -134,7 +162,7 @@ module "ec2_2" {
   subnet_id = module.subnet_2.subnet_id
   name = "My WebServer Dev 3"
   instance_type = "t2.micro"
-  vpc_security_group_ids = []
+  vpc_security_group_ids = [module.security_group_sub2.security_group_id]
 }
 
 module "s3" {
@@ -165,18 +193,21 @@ module "network_interface" {
 }
 
 module "network_interface_attachment_1" {
+  source = "../../modules/network_interface_attachment"
   instance_id = module.ec2_0.instance_id
   network_interface_id = module.network_interface.network_interface_id
   device_index = 0
 }
 
 module "network_interface_attachment_2" {
+  source = "../../modules/network_interface_attachment"
   instance_id = module.ec2_1.instance_id
   network_interface_id = module.network_interface.network_interface_id
   device_index = 1
 }
 
 module "network_interface_attachment_3" {
+  source = "../../modules/network_interface_attachment"
   instance_id = module.ec2_2.instance_id
   network_interface_id = module.network_interface.network_interface_id
   device_index = 2

@@ -5,10 +5,12 @@ variable "sub" {
 variable "subnet_id" {
   type = string
   description = "The ID of the subnet to associate with"
+  default = ""
 }
 variable "gateway_id" {
   type = string
   description = "The ID of the gateway to associate with"
+  default = ""
 }
 variable "route_table_id" {
   type = string

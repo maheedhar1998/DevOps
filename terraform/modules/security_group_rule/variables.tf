@@ -21,6 +21,7 @@ variable "security_group_id" {
 variable "source_sg_id" {
   type = string
   description = "The ID of the Source Security Group"
+  default = ""
 }
 variable "source_sg" {
   type = bool
@@ -29,8 +30,10 @@ variable "source_sg" {
 variable "cidr_blocks" {
   type = list(string)
   description = "A List of Source IPv4 CIDR Blocks"
+  default = [""]
 }
 variable "ipv6_cidr_blocks" {
   type = list(string)
   description = "A list of Source IPv6 CIDR Blocks"
+  default = [""]
 }
