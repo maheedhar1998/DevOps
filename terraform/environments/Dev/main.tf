@@ -10,11 +10,16 @@ module "VPC" {
   cidr_block = "10.11.0.0/16"
 }
 
+module "availability_zones" {
+  source = "../../modules/availability_zones"
+}
+
 module "subnet_1" {
   source = "../../modules/subnet"
   vpc_id = module.VPC.vpc_id
   subnet_cidr_block = "10.11.1.0/24"
   name = "Main 10.11.1.0/24 ${module.VPC.vpc_id}"
+  az_id = module.availability_zones.availability_zones[0]
 }
 
 module "security_group_sub1" {
@@ -92,6 +97,7 @@ module "subnet_2" {
   vpc_id = module.VPC.vpc_id
   subnet_cidr_block = "10.11.2.0/24"
   name = "Main 10.11.2.0/24 ${module.VPC.vpc_id}"
+  az_id = module.availability_zones.availability_zones[1]
 }
 
 module "security_group_sub2" {
