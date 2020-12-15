@@ -30,10 +30,10 @@ variable "source_sg" {
 variable "cidr_blocks" {
   type = list(string)
   description = "A List of Source IPv4 CIDR Blocks"
-  default = [""]
+  default = []
 }
 variable "ipv6_cidr_blocks" {
   type = list(string)
   description = "A list of Source IPv6 CIDR Blocks"
-  default = [""]
+  default = []
 }

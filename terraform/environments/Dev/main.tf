@@ -19,7 +19,7 @@ module "subnet_1" {
 
 module "security_group_sub1" {
   source = "../../modules/security_group"
-  description = "public-security-group"
+  sg_description = "public-security-group"
   vpc_id = module.VPC.vpc_id
   name = "public-security-group"
 }
@@ -32,8 +32,8 @@ module "security_group_1_rule_1" {
   to_port = 80
   protocol = "tcp"
   security_group_id = module.security_group_sub1.security_group_id
-  cidr_blocks = "0.0.0.0/0"
-  ipv6_cidr_blocks = "::/0"
+  cidr_blocks = ["0.0.0.0/0"]
+  ipv6_cidr_blocks = ["::/0"]
 }
 
 module "security_group_1_rule_2" {
@@ -44,13 +44,13 @@ module "security_group_1_rule_2" {
   to_port = 443
   protocol = "tcp"
   security_group_id = module.security_group_sub1.security_group_id
-  cidr_blocks = "0.0.0.0/0"
-  ipv6_cidr_blocks = "::/0"
+  cidr_blocks = ["0.0.0.0/0"]
+  ipv6_cidr_blocks = ["::/0"]
 }
 
 module "security_group_bastion" {
   source = "../../modules/security_group"
-  description = "Bastion Security Group"
+  sg_description = "Bastion Security Group"
   vpc_id = module.VPC.vpc_id
   name = "bastion-sg"
 }
@@ -63,7 +63,7 @@ module "bastion_sg_rule_1" {
   to_port = 22
   protocol = "tcp"
   security_group_id = module.security_group_bastion.security_group_id
-  cidr_blocks = "98.25.199.67/32"
+  cidr_blocks = ["98.25.199.67/32"]
 }
 
 module "route_table_sub_1" {
@@ -96,7 +96,7 @@ module "subnet_2" {
 
 module "security_group_sub2" {
   source = "../../modules/security_group"
-  description = "private-security-group"
+  sg_description = "private-security-group"
   vpc_id = module.VPC.vpc_id
   name = "private-sg"
 }
@@ -112,6 +112,17 @@ module "security_group_2_rule_1" {
   source_sg_id = module.security_group_sub1.security_group_id
 }
 
+module "security_group_2_rule_2" {
+  source = "../../modules/security_group_rule"
+  source_sg = true
+  type = "ingress"
+  from_port = 22
+  to_port = 22
+  protocol = "tcp"
+  security_group_id = module.security_group_sub2.security_group_id
+  source_sg_id = module.security_group_sub1.security_group_id
+}
+
 module "route_table_sub_2" {
   source = "../../modules/route_table"
   name = "Private Subnet Route Table"
@@ -120,7 +131,7 @@ module "route_table_sub_2" {
 
 module "route_1_sub2" {
   source = "../../modules/route"
-  route_table_id = module.route_table_sub_1.route_table_id
+  route_table_id = module.route_table_sub_2.route_table_id
   nat = true
   dest_cidr = "0.0.0.0/0"
   nat_gateway_id = module.nat_gateway.nat_gateway_id
@@ -181,43 +192,44 @@ module "ig" {
 module "elastic_ip" {
   source = "../../modules/elastic_ip"
   name = "NAT Gateway Elastic IP"
-  network_interface_id = module.network_interface.network_interface_id
-}
-
-module "network_interface" {
-  source = "../../modules/network_interface"
-  name = "NAT Elastic Network Interface"
-  subnet_id = module.subnet_2.subnet_id
-  private_ips = ["10.11.2.50"]
-  security_groups = [] # TODO Security Group Association
-}
-
-module "network_interface_attachment_1" {
-  source = "../../modules/network_interface_attachment"
-  instance_id = module.ec2_0.instance_id
-  network_interface_id = module.network_interface.network_interface_id
-  device_index = 0
-}
-
-module "network_interface_attachment_2" {
-  source = "../../modules/network_interface_attachment"
-  instance_id = module.ec2_1.instance_id
-  network_interface_id = module.network_interface.network_interface_id
-  device_index = 1
-}
-
-module "network_interface_attachment_3" {
-  source = "../../modules/network_interface_attachment"
-  instance_id = module.ec2_2.instance_id
-  network_interface_id = module.network_interface.network_interface_id
-  device_index = 2
 }
 
 module "nat_gateway" {
   source = "../../modules/nat_gateway"
   name = "NAT Gateway Dev"
-  eip_id = module.elastic_ip.id
+  eip_id = module.elastic_ip.eip_id
   subnet_id = module.subnet_1.subnet_id
+}
+
+module "load_balancer_target_group" {
+  source = "../../modules/lb_target_group"
+  name = "api-webserver-target-group"
+  port = 80
+  protocol = "HTTP"
+  vpc_id = module.VPC.vpc_id
+  target_type = "instance"
+  lb_algorithm = "round_robin"
+}
+
+module "lb_target_group_attachment_0" {
+  source = "../../modules/lb_target_attachment"
+  target_group_arn = module.load_balancer_target_group.target_group_arn
+  target_id = module.ec2_0.instance_id
+  port = 80
+}
+
+module "lb_target_group_attachment_1" {
+  source = "../../modules/lb_target_attachment"
+  target_group_arn = module.load_balancer_target_group.target_group_arn
+  target_id = module.ec2_1.instance_id
+  port = 80
+}
+
+module "lb_target_group_attachment_2" {
+  source = "../../modules/lb_target_attachment"
+  target_group_arn = module.load_balancer_target_group.target_group_arn
+  target_id = module.ec2_2.instance_id
+  port = 80
 }
 
 module "load_balancer" {
@@ -228,4 +240,12 @@ module "load_balancer" {
   subnets = [module.subnet_1.subnet_id, module.subnet_2.subnet_id]
   log_bucket = module.s3.bucket_name
   s3_prefix = "ALB_Logs_"
+}
+
+module "load_balancer_listener" {
+  source = "../../modules/lb_listener"
+  load_balancer_arn = module.load_balancer.load_balancer_arn
+  port = 80
+  protocol = "HTTP"
+  target_group_arn = module.load_balancer_target_group.target_group_arn
 }

@@ -9,10 +9,12 @@ variable "dest_cidr" {
 variable "gateway_id" {
   type = string
   description = "The ID of a VPC Internet Gateway or a Virtual Private Gateway"
+  default = ""
 }
 variable "nat_gateway_id" {
   type = string
   description = "The ID of the NAT Gateway"
+  default = ""
 }
 variable "nat" {
   type = bool

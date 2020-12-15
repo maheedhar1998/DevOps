@@ -9,7 +9,6 @@ terraform {
 
 resource "aws_eip" "nat_eip" {
   vpc = true
-  network_interface = var.network_interface_id
   tags = {
     Name = var.name
   }

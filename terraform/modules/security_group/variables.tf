@@ -2,7 +2,7 @@ variable "name" {
   type = string
   description = "Security Group Name"
 }
-variable "description" {
+variable "sg_description" {
   type = string
   description = "The Description of the Security Group"
 }
