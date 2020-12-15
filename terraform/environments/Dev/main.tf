@@ -1,3 +1,11 @@
+terraform {
+  backend "s3" {
+    bucket = "terraform-state-files-maheedhar"
+    key = "terraform_state/devOps_tutorial"
+    region = "us-east-1"
+  }
+}
+
 provider "aws" {
   region = "us-east-1"
   shared_credentials_file = "/home/maheedharm/.aws/credentials"
@@ -54,6 +62,18 @@ module "security_group_1_rule_2" {
   ipv6_cidr_blocks = ["::/0"]
 }
 
+module "security_group_1_rule_3" {
+  source = "../../modules/security_group_rule"
+  source_sg = false
+  type = "egress"
+  from_port = 0
+  to_port = 65535
+  protocol = "all"
+  security_group_id = module.security_group_sub1.security_group_id
+  cidr_blocks = ["0.0.0.0/0"]
+  ipv6_cidr_blocks = ["::/0"]
+}
+
 module "security_group_bastion" {
   source = "../../modules/security_group"
   sg_description = "Bastion Security Group"
@@ -70,6 +90,29 @@ module "bastion_sg_rule_1" {
   protocol = "tcp"
   security_group_id = module.security_group_bastion.security_group_id
   cidr_blocks = ["98.25.199.67/32"]
+}
+
+module "bastion_sg_rule_2" {
+  source = "../../modules/security_group_rule"
+  source_sg = false
+  type = "egress"
+  from_port = 0
+  to_port = 65535
+  protocol = "all"
+  security_group_id = module.security_group_bastion.security_group_id
+  cidr_blocks = ["0.0.0.0/0"]
+  ipv6_cidr_blocks = ["::/0"]
+}
+
+module "bastion_sg_rule_3" {
+  source = "../../modules/security_group_rule"
+  source_sg = true
+  type = "ingress"
+  from_port = 22
+  to_port = 22
+  protocol = "tcp"
+  security_group_id = module.security_group_bastion.security_group_id
+  source_sg_id = module.security_group_sub2.security_group_id
 }
 
 module "route_table_sub_1" {
@@ -106,7 +149,7 @@ module "security_group_sub2" {
   source = "../../modules/security_group"
   sg_description = "private-security-group"
   vpc_id = module.VPC.vpc_id
-  name = "private-security"
+  name = "private-security-group"
 }
 
 module "security_group_2_rule_1" {
@@ -129,6 +172,40 @@ module "security_group_2_rule_2" {
   protocol = "tcp"
   security_group_id = module.security_group_sub2.security_group_id
   source_sg_id = module.security_group_sub1.security_group_id
+}
+
+module "security_group_2_rule_3" {
+  source = "../../modules/security_group_rule"
+  source_sg = false
+  type = "egress"
+  from_port = 0
+  to_port = 65535
+  protocol = "all"
+  security_group_id = module.security_group_sub2.security_group_id
+  cidr_blocks = ["0.0.0.0/0"]
+  ipv6_cidr_blocks = ["::/0"]
+}
+
+module "security_group_2_rule_4" {
+  source = "../../modules/security_group_rule"
+  source_sg = true
+  type = "ingress"
+  from_port = 80
+  to_port = 80
+  protocol = "tcp"
+  security_group_id = module.security_group_sub2.security_group_id
+  source_sg_id = module.security_group_bastion.security_group_id
+}
+
+module "security_group_2_rule_5" {
+  source = "../../modules/security_group_rule"
+  source_sg = true
+  type = "ingress"
+  from_port = 22
+  to_port = 22
+  protocol = "tcp"
+  security_group_id = module.security_group_sub2.security_group_id
+  source_sg_id = module.security_group_bastion.security_group_id
 }
 
 module "route_table_sub_2" {
