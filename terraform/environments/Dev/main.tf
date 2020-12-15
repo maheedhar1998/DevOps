@@ -6,7 +6,7 @@ provider "aws" {
 
 module "VPC" {
   source = "../../modules/vpc"
-  vpc_name = "Dev_VPC"
+  vpc_name = "dev-VPC"
   cidr_block = "10.11.0.0/16"
 }
 
@@ -18,8 +18,9 @@ module "subnet_1" {
   source = "../../modules/subnet"
   vpc_id = module.VPC.vpc_id
   subnet_cidr_block = "10.11.1.0/24"
-  name = "Main 10.11.1.0/24 ${module.VPC.vpc_id}"
+  name = "public-subnet-10.11.1.0/24"
   az_id = module.availability_zones.availability_zones[0]
+  auto_public_ip = true
 }
 
 module "security_group_sub1" {
@@ -57,7 +58,7 @@ module "security_group_bastion" {
   source = "../../modules/security_group"
   sg_description = "Bastion Security Group"
   vpc_id = module.VPC.vpc_id
-  name = "bastion-sg"
+  name = "bastion-security-group"
 }
 
 module "bastion_sg_rule_1" {
@@ -73,7 +74,7 @@ module "bastion_sg_rule_1" {
 
 module "route_table_sub_1" {
   source = "../../modules/route_table"
-  name = "Public Subnet Route Table"
+  name = "public-route-table"
   vpc_id = module.VPC.vpc_id
 }
 
@@ -96,15 +97,16 @@ module "subnet_2" {
   source = "../../modules/subnet"
   vpc_id = module.VPC.vpc_id
   subnet_cidr_block = "10.11.2.0/24"
-  name = "Main 10.11.2.0/24 ${module.VPC.vpc_id}"
+  name = "private-subnet-10.11.2.0/24"
   az_id = module.availability_zones.availability_zones[1]
+  auto_public_ip = false
 }
 
 module "security_group_sub2" {
   source = "../../modules/security_group"
   sg_description = "private-security-group"
   vpc_id = module.VPC.vpc_id
-  name = "private-sg"
+  name = "private-security"
 }
 
 module "security_group_2_rule_1" {
@@ -131,7 +133,7 @@ module "security_group_2_rule_2" {
 
 module "route_table_sub_2" {
   source = "../../modules/route_table"
-  name = "Private Subnet Route Table"
+  name = "private-route-table"
   vpc_id = module.VPC.vpc_id
 }
 
@@ -150,36 +152,46 @@ module "route_table_sub_2_association" {
   route_table_id = module.route_table_sub_2.route_table_id
 }
 
+module "key_pair" {
+  source = "../../modules/key_pair"
+  name = "my-ssh-key"
+  public_key  = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC9dwsDLDLf5SpLt7CG+F/pS0OCkgk9AjTJnKMba5LWrXb4cqyL+cjeuds/vOhr6Vhw9BIt3GEb1rFP5eOkUZTqSwxEyirm5beEtyRutciuUGuDAKLogAAD6frX40YHNezCyCgViV4XSIG42YjmZBhajzZM19XcaqFTSYigXMKKiZJ0jnd7Iad03u+Abr6Ijd9ygXTTkuB3zly+hvIQGppnkC1eZ7whaPr6AD22WYhbFQ+knPtzWPBpTALgKBCnwcTN8MsnWVxT/SIX84uzQO0z4ZBgewwKtdCtscS6nNWsyLlONEGSakLcAtCz9bjfNLVLa6en3TsOacCg4o3uAsFDLcqvOhWKMMocED2cdrYWhlp9aHq/Z1sCG4pcjC79e1lged0WjnycVggrJ1BcZqh+AW9DA2s+1i4T+oyEdoJbPc/n0mpg1d99qinKlYU+xijJXesHadNPxqF0eoH4SiJJoPGGDKhUJkYzKqCESYp+B5rBhUi4aFSDikkXTv9zqec= maheedhar@maheedhars-ryzen-ripper-linux"
+}
+
 module "ec2_bastion" {
   source = "../../modules/ec2/red_hat"
   subnet_id = module.subnet_1.subnet_id
-  name = "My Bastion Host"
+  name = "my-bastion-host"
   instance_type = "t2.micro"
   vpc_security_group_ids = [module.security_group_bastion.security_group_id]
+  key_name = "my-ssh-key"
 }
 
 module "ec2_0" {
   source = "../../modules/ec2/red_hat"
   subnet_id = module.subnet_2.subnet_id
-  name = "My WebServer Dev 1"
+  name = "my-webserver-0"
   instance_type = "t2.micro"
   vpc_security_group_ids = [module.security_group_sub2.security_group_id]
+  key_name = "my-ssh-key"
 }
 
 module "ec2_1" {
   source = "../../modules/ec2/red_hat"
   subnet_id = module.subnet_2.subnet_id
-  name = "My WebServer Dev 2"
+  name = "my-webserver-1"
   instance_type = "t2.micro"
   vpc_security_group_ids = [module.security_group_sub2.security_group_id]
+  key_name = "my-ssh-key"
 }
 
 module "ec2_2" {
   source = "../../modules/ec2/red_hat"
   subnet_id = module.subnet_2.subnet_id
-  name = "My WebServer Dev 3"
+  name = "my-webserver-2"
   instance_type = "t2.micro"
   vpc_security_group_ids = [module.security_group_sub2.security_group_id]
+  key_name = "my-ssh-key"
 }
 
 module "s3" {
@@ -197,12 +209,12 @@ module "ig" {
 
 module "elastic_ip" {
   source = "../../modules/elastic_ip"
-  name = "NAT Gateway Elastic IP"
+  name = "nat-gateway-elastic-ip"
 }
 
 module "nat_gateway" {
   source = "../../modules/nat_gateway"
-  name = "NAT Gateway Dev"
+  name = "nat-gateway-dev"
   eip_id = module.elastic_ip.eip_id
   subnet_id = module.subnet_1.subnet_id
 }
@@ -240,7 +252,7 @@ module "lb_target_group_attachment_2" {
 
 module "load_balancer" {
   source = "../../modules/load_balancer"
-  name = "Apllication-Load-Balancer-Dev"
+  name = "apllication-load-balancer-dev"
   internal = false
   lb_type = "application"
   subnets = [module.subnet_1.subnet_id, module.subnet_2.subnet_id]
