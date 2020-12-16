@@ -18,3 +18,7 @@ variable "key_name" {
     type = string
     description = "Name of the Key Pair"
 }
+variable "number_of_instances" {
+    type = number
+    description = "Number of instances to initialize"
+}

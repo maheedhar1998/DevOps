@@ -26,7 +26,7 @@ module "subnet_1" {
   source = "../../modules/subnet"
   vpc_id = module.VPC.vpc_id
   subnet_cidr_block = "10.11.1.0/24"
-  name = "public-subnet-10.11.1.0/24"
+  name = "public-subnet-dev"
   az_id = module.availability_zones.availability_zones[0]
   auto_public_ip = true
 }
@@ -140,7 +140,7 @@ module "subnet_2" {
   source = "../../modules/subnet"
   vpc_id = module.VPC.vpc_id
   subnet_cidr_block = "10.11.2.0/24"
-  name = "private-subnet-10.11.2.0/24"
+  name = "webserver-subnet-dev"
   az_id = module.availability_zones.availability_zones[1]
   auto_public_ip = false
 }
@@ -149,7 +149,7 @@ module "security_group_sub2" {
   source = "../../modules/security_group"
   sg_description = "private-security-group"
   vpc_id = module.VPC.vpc_id
-  name = "private-security-group"
+  name = "webserver-security-group"
 }
 
 module "security_group_2_rule_1" {
@@ -210,7 +210,7 @@ module "security_group_2_rule_5" {
 
 module "route_table_sub_2" {
   source = "../../modules/route_table"
-  name = "private-route-table"
+  name = "webserver-route-table"
   vpc_id = module.VPC.vpc_id
 }
 
@@ -237,35 +237,19 @@ module "key_pair" {
 
 module "ec2_bastion" {
   source = "../../modules/ec2/red_hat"
+  number_of_instances = 1
   subnet_id = module.subnet_1.subnet_id
-  name = "my-bastion-host"
+  name = "bastion-host-dev"
   instance_type = "t2.micro"
   vpc_security_group_ids = [module.security_group_bastion.security_group_id]
   key_name = "my-ssh-key"
 }
 
-module "ec2_0" {
+module "ec2_webserver" {
   source = "../../modules/ec2/red_hat"
+  number_of_instances = 3
   subnet_id = module.subnet_2.subnet_id
-  name = "my-webserver-0"
-  instance_type = "t2.micro"
-  vpc_security_group_ids = [module.security_group_sub2.security_group_id]
-  key_name = "my-ssh-key"
-}
-
-module "ec2_1" {
-  source = "../../modules/ec2/red_hat"
-  subnet_id = module.subnet_2.subnet_id
-  name = "my-webserver-1"
-  instance_type = "t2.micro"
-  vpc_security_group_ids = [module.security_group_sub2.security_group_id]
-  key_name = "my-ssh-key"
-}
-
-module "ec2_2" {
-  source = "../../modules/ec2/red_hat"
-  subnet_id = module.subnet_2.subnet_id
-  name = "my-webserver-2"
+  name = "webserver-dev"
   instance_type = "t2.micro"
   vpc_security_group_ids = [module.security_group_sub2.security_group_id]
   key_name = "my-ssh-key"
@@ -310,21 +294,21 @@ module "load_balancer_target_group" {
 module "lb_target_group_attachment_0" {
   source = "../../modules/lb_target_attachment"
   target_group_arn = module.load_balancer_target_group.target_group_arn
-  target_id = module.ec2_0.instance_id
+  target_id = module.ec2_webserver.instance_ids[0]
   port = 80
 }
 
 module "lb_target_group_attachment_1" {
   source = "../../modules/lb_target_attachment"
   target_group_arn = module.load_balancer_target_group.target_group_arn
-  target_id = module.ec2_1.instance_id
+  target_id = module.ec2_webserver.instance_ids[1]
   port = 80
 }
 
 module "lb_target_group_attachment_2" {
   source = "../../modules/lb_target_attachment"
   target_group_arn = module.load_balancer_target_group.target_group_arn
-  target_id = module.ec2_2.instance_id
+  target_id = module.ec2_webserver.instance_ids[2]
   port = 80
 }
 
