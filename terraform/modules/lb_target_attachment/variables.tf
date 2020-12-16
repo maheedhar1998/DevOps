@@ -2,8 +2,8 @@ variable "target_group_arn" {
   type = string
   description = "The ARN of the target group with which to register targets"
 }
-variable "target_id" {
-  type = string
+variable "target_ids" {
+  type = list(string)
   description = "The ID of the Target"
 }
 variable "port" {

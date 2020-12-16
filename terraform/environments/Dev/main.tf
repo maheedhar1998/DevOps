@@ -291,24 +291,10 @@ module "load_balancer_target_group" {
   lb_algorithm = "round_robin"
 }
 
-module "lb_target_group_attachment_0" {
+module "lb_target_group_attachment" {
   source = "../../modules/lb_target_attachment"
   target_group_arn = module.load_balancer_target_group.target_group_arn
-  target_id = module.ec2_webserver.instance_ids[0]
-  port = 80
-}
-
-module "lb_target_group_attachment_1" {
-  source = "../../modules/lb_target_attachment"
-  target_group_arn = module.load_balancer_target_group.target_group_arn
-  target_id = module.ec2_webserver.instance_ids[1]
-  port = 80
-}
-
-module "lb_target_group_attachment_2" {
-  source = "../../modules/lb_target_attachment"
-  target_group_arn = module.load_balancer_target_group.target_group_arn
-  target_id = module.ec2_webserver.instance_ids[2]
+  target_ids = module.ec2_webserver.instance_ids
   port = 80
 }
 
