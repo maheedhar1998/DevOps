@@ -10,6 +10,10 @@ variable "protocol" {
   type = string
   description = "The protocol to use for routing traffic to the targets."
 }
+variable "health_check_protocol" {
+  type = string
+  description = "The protocol to use for routing traffic to the targets."
+}
 variable "vpc_id" {
   type = string
   description = "The identifier of the VPC in which to create the target group."

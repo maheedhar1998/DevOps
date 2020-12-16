@@ -17,9 +17,9 @@ resource "aws_lb_target_group" "lb_target" {
   deregistration_delay = 30
   health_check {
     enabled = true
-    interval = 5
+    # interval = 5
     port = var.port
-    protocol = var.protocol
-    timeout = 4
+    protocol = var.health_check_protocol
+    # timeout = 4
   }
 }

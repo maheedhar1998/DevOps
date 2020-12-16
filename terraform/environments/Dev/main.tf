@@ -301,6 +301,7 @@ module "load_balancer_target_group" {
   name = "api-webserver-target-group"
   port = 80
   protocol = "HTTP"
+  health_check_protocol = "HTTP"
   vpc_id = module.VPC.vpc_id
   target_type = "instance"
   lb_algorithm = "round_robin"
@@ -333,6 +334,7 @@ module "load_balancer" {
   internal = false
   lb_type = "application"
   subnets = [module.subnet_1.subnet_id, module.subnet_2.subnet_id]
+  security_groups = [module.security_group_sub1.security_group_id]
   log_bucket = module.s3.bucket_name
   s3_prefix = "ALB_Logs_"
 }
