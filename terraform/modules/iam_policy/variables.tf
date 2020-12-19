@@ -9,16 +9,16 @@ variable "description" {
 variable "policy" {
   type = string
   description = "JSON formatted policy document"
-  default = <<EOF
+  default = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
     {
-      "Version": "2012-10-17",
-      "Statement": [
-        {
-          "Action": "*",
-          "Effect": "Deny",
-          "Resource": "*"
-        }
-      ]
+      "Action": "*",
+      "Effect": "Deny",
+      "Resource": "*"
     }
-  EOF
+  ]
+}
+  POLICY
 }

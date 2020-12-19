@@ -22,3 +22,8 @@ variable "number_of_instances" {
     type = number
     description = "Number of instances to initialize"
 }
+variable "iam_instance_profile" {
+    type = string
+    description = "Name of the Instance Profile"
+    default = ""
+}

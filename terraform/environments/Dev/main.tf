@@ -245,6 +245,58 @@ module "ec2_bastion" {
   key_name = "my-ssh-key"
 }
 
+module "iam_ec2_to_s3_access_policy" {
+  source = "../../modules/iam_policy"
+  name = "ec2_to_s3_access"
+  description = "Gives EC2 acess to S3 Buckets"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "s3:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+  EOF
+}
+
+module "iam_ec2_to_s3_access_role" {
+  source = "../../modules/iam_role"
+  name = "ec2_to_s3_access"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+  EOF
+}
+
+module "iam_ec2_to_s3_policy_attach" {
+  source = "../../modules/iam_role_policy_attachment"
+  role = module.iam_ec2_to_s3_access_role.name
+  policy_arn = module.iam_ec2_to_s3_access_policy.policy_arn
+}
+
+module "iam_ec2_webserver_instance_profile" {
+  source = "../../modules/iam_instance_profile"
+  name = "webserver-dev-role-attach"
+  role = module.iam_ec2_to_s3_access_role.name
+}
+
 module "ec2_webserver" {
   source = "../../modules/ec2/red_hat"
   number_of_instances = 3
@@ -253,6 +305,7 @@ module "ec2_webserver" {
   instance_type = "t2.micro"
   vpc_security_group_ids = [module.security_group_sub2.security_group_id]
   key_name = "my-ssh-key"
+  iam_instance_profile = module.iam_ec2_webserver_instance_profile.name
 }
 
 module "s3" {
