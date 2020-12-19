@@ -33,9 +33,9 @@ module "subnet_1" {
 
 module "security_group_sub1" {
   source = "../../modules/security_group"
-  sg_description = "public-security-group"
+  sg_description = "public-dev-sg"
   vpc_id = module.VPC.vpc_id
-  name = "public-security-group"
+  name = "public-dev-sg"
 }
 
 module "security_group_1_rule_1" {
@@ -76,9 +76,9 @@ module "security_group_1_rule_3" {
 
 module "security_group_bastion" {
   source = "../../modules/security_group"
-  sg_description = "Bastion Security Group"
+  sg_description = "Bastion-dev-sg"
   vpc_id = module.VPC.vpc_id
-  name = "bastion-security-group"
+  name = "bastion-dev-sg"
 }
 
 module "bastion_sg_rule_1" {
@@ -147,9 +147,9 @@ module "subnet_2" {
 
 module "security_group_sub2" {
   source = "../../modules/security_group"
-  sg_description = "private-security-group"
+  sg_description = "webserver-dev-sg"
   vpc_id = module.VPC.vpc_id
-  name = "webserver-security-group"
+  name = "webserver-dev-sg"
 }
 
 module "security_group_2_rule_1" {
