@@ -11,5 +11,5 @@ func listS3Buckets() []string {
 }
 
 func createS3Bucket() bool {
-
+	return false
 }
