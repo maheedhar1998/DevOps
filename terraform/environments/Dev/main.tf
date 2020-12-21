@@ -299,7 +299,7 @@ module "iam_ec2_webserver_instance_profile" {
 
 module "ec2_webserver" {
   source = "../../modules/ec2/red_hat"
-  number_of_instances = 3
+  number_of_instances = 4
   subnet_id = module.subnet_2.subnet_id
   name = "webserver-dev"
   instance_type = "t2.micro"
@@ -347,7 +347,7 @@ module "load_balancer_target_group" {
 module "lb_target_group_attachment" {
   source = "../../modules/lb_target_attachment"
   target_group_arn = module.load_balancer_target_group.target_group_arn
-  target_ids = module.ec2_webserver.instance_ids
+  target_ids = slice(module.ec2_webserver.instance_ids, 0, 3)
   port = 80
 }
 
