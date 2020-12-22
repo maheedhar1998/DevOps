@@ -4,6 +4,12 @@ terraform {
     key = "terraform_state/devOps_tutorial"
     region = "us-east-1"
   }
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "~> 3.0"
+    }
+  }
 }
 
 provider "aws" {
@@ -300,10 +306,21 @@ module "iam_ec2_webserver_instance_profile" {
 
 module "ec2_webserver" {
   source = "../../modules/ec2/red_hat"
-  number_of_instances = 4
+  number_of_instances = 3
   subnet_id = module.subnet_2.subnet_id
   name = "webserver-dev"
   instance_type = "t2.micro"
+  vpc_security_group_ids = [module.security_group_sub2.security_group_id]
+  key_name = "my-ssh-key"
+  iam_instance_profile = module.iam_ec2_webserver_instance_profile.name
+}
+
+module "ec2_kafka_server" {
+  source = "../../modules/ec2/red_hat"
+  number_of_instances = 1
+  subnet_id = module.subnet_2.subnet_id
+  name = "kafka-server-dev"
+  instance_type = "t2.large"
   vpc_security_group_ids = [module.security_group_sub2.security_group_id]
   key_name = "my-ssh-key"
   iam_instance_profile = module.iam_ec2_webserver_instance_profile.name
@@ -348,7 +365,7 @@ module "load_balancer_target_group" {
 module "lb_target_group_attachment" {
   source = "../../modules/lb_target_attachment"
   target_group_arn = module.load_balancer_target_group.target_group_arn
-  target_ids = slice(module.ec2_webserver.instance_ids, 0, 3)
+  target_ids = module.ec2_webserver.instance_ids
   port = 80
 }
 

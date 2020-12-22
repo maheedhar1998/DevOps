@@ -1,12 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-      version = "~> 3.0"
-    }
-  }
-}
-
 resource "aws_lb_target_group" "lb_target" {
   name = var.name
   port = var.port

@@ -1,12 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-      version = "~> 3.0"
-    }
-  }
-}
-
 resource "aws_security_group_rule" "sg_rule" {
   count = var.source_sg ? 1 : 0
   type = var.type

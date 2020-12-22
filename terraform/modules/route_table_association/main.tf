@@ -1,12 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-      version = "~> 3.0"
-    }
-  }
-}
-
 resource "aws_route_table_association" "subnet_ass" {
   count = var.sub ? 1 : 0
   subnet_id = var.subnet_id

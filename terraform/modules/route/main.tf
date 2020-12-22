@@ -1,12 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-      version = "~> 3.0"
-    }
-  }
-}
-
 resource "aws_route" "r1" {
   count = var.nat ? 0 : 1
   route_table_id = var.route_table_id

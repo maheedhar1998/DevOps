@@ -1,14 +1,5 @@
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-      version = "~> 3.0"
-    }
-  }
-}
-
 data "aws_ami" "Red_Hat" {
-  owners = ["309956199498"]
+  owners = ["amazon"]
   most_recent = true
   filter {
     name = "virtualization-type"
@@ -16,7 +7,7 @@ data "aws_ami" "Red_Hat" {
   }
   filter {
     name = "name"
-    values = ["*RHEL*"]
+    values = ["amzn2-ami*"]
   }
   filter {
     name = "architecture"
