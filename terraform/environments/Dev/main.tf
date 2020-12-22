@@ -268,6 +268,7 @@ module "iam_ec2_to_s3_access_policy" {
 module "iam_ec2_to_s3_access_role" {
   source = "../../modules/iam_role"
   name = "ec2_to_s3_access"
+  // Following Policy allows EC2 Instances to assume this role
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
