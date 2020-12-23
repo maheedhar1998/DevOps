@@ -5,14 +5,15 @@
     name: *
     state: latest
     update_only: yes
-- name: Install git
+  become: true
+- name: Install git, wget, go, 
   yum:
-    name: git
-    state: latest
-- name: Install wget
-  yum:
-    name: wget
-    state: latest
+    name:
+      - git
+      - wget
+      - go
+      -
+  
 - name: Install Docker
   command: /usr/bin/amazon-linux-extras install docker
   become: yes
@@ -26,11 +27,14 @@
   command: /usr/sbin/usermod -a -G docker ec2-user
   become: yes
   become_user: root
+  become_method: su
 - name: Getting the docker-compose pkg
   command: /usr/bin/curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/bin/docker-compose
   become: yes
   become_user: root
+  become_methos: su
 - name: Enabling docker-compose to execute
   command: /usr/bin/chmod +x /usr/bin/docker-compose
   become: yes
   become_user: root
+  become_method: su
