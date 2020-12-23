@@ -80,6 +80,17 @@ module "security_group_1_rule_3" {
   ipv6_cidr_blocks = ["::/0"]
 }
 
+module "security_group_1_rule_4" {
+  source = "../../modules/security_group_rule"
+  source_sg = true
+  type = "ingress"
+  from_port = 6969
+  to_port = 6969
+  protocol = "tcp"
+  security_group_id = module.security_group_sub1.security_group_id
+  source_sg_id = module.security_group_sub2.security_group_id
+}
+
 module "security_group_bastion" {
   source = "../../modules/security_group"
   sg_description = "Bastion-dev-sg"
@@ -116,6 +127,17 @@ module "bastion_sg_rule_3" {
   type = "ingress"
   from_port = 22
   to_port = 22
+  protocol = "tcp"
+  security_group_id = module.security_group_bastion.security_group_id
+  source_sg_id = module.security_group_sub2.security_group_id
+}
+
+module "bastion_sg_rule_4" {
+  source = "../../modules/security_group_rule"
+  source_sg = true
+  type = "ingress"
+  from_port = 6969
+  to_port = 6969
   protocol = "tcp"
   security_group_id = module.security_group_bastion.security_group_id
   source_sg_id = module.security_group_sub2.security_group_id
