@@ -1,0 +1,7 @@
+[Unit]
+Description=Kafka Consumer Service
+
+[Service]
+ExecStart=/usr/bin/go run consumer.go
+WorkingDirectory=/home/ec2-user/
+Restart=always

@@ -1,0 +1,15 @@
+---
+# tasks file for bastion
+- name: Update the instance
+  yum:
+    name: *
+    state: latest
+    update_only: yes
+- name: Install git
+  yum:
+    name: git
+    state: latest
+- name: Install wget
+  yum:
+    name: wget
+    state: latest

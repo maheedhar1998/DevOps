@@ -1,0 +1,36 @@
+---
+# tasks file for kafka
+- name: Update the instance
+  yum:
+    name: *
+    state: latest
+    update_only: yes
+- name: Install git
+  yum:
+    name: git
+    state: latest
+- name: Install wget
+  yum:
+    name: wget
+    state: latest
+- name: Install Docker
+  command: /usr/bin/amazon-linux-extras install docker
+  become: yes
+  become_user: root
+- name: Configure Docker
+  service:
+    name: docker
+    enabled: yes
+    state: started
+- name: Giving ec2-user access to docker
+  command: /usr/sbin/usermod -a -G docker ec2-user
+  become: yes
+  become_user: root
+- name: Getting the docker-compose pkg
+  command: /usr/bin/curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/bin/docker-compose
+  become: yes
+  become_user: root
+- name: Enabling docker-compose to execute
+  command: /usr/bin/chmod +x /usr/bin/docker-compose
+  become: yes
+  become_user: root
