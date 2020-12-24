@@ -5,11 +5,10 @@
     name: "*"
     state: latest
     update_only: yes
-- name: Install git
+- name: Install git, wget,
   yum:
-    name: git
+    name:
+      - git
+      - wget
     state: latest
-- name: Install wget
-  yum:
-    name: wget
-    state: latest
+- name: 

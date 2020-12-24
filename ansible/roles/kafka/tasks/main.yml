@@ -2,7 +2,7 @@
 # tasks file for kafka
 - name: Update the instance
   yum:
-    name: *
+    name: "*"
     state: latest
     update_only: yes
   become: true
@@ -12,8 +12,6 @@
       - git
       - wget
       - go
-      -
-  
 - name: Install Docker
   command: /usr/bin/amazon-linux-extras install docker
   become: yes
@@ -38,3 +36,25 @@
   become: yes
   become_user: root
   become_method: su
+- name: Download data file
+  command: /usr/bin/wget https://datasets.imdbws.com/name.basics.tsv.gz
+- name: Extract the data file
+  command: /usr/bin/gzip -d /home/ec2-user/name.basics.tsv.gz
+- name: Rename the data file
+  command: /usr/bin/mv /home/ec2-user/name.basics.tsv /home/ec2-user/data.tsv
+- name: Copying Producer script file
+  copy:
+    src: producer.go
+    dest: /home/ec2-user/producer.go
+- name: Copying Producer Service file
+  copy:
+    src: producer.service
+    dest: /etc/systemd/system/producer.service
+- name: Copying Docker compose yaml file
+  copy:
+    src: docker-compose.yml
+    dest: /home/ec2-user/docker-compose.yml
+- name: Copying Kafka service file
+  copy:
+    src: kafka.service
+    dest: /etc/systemd/system/kafka.service
