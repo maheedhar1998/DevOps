@@ -5,15 +5,83 @@
     name: "*"
     state: latest
     update_only: yes
-  become: true
+  become: yes
+  become_user: root
 - name: Install git, wget, go, 
   yum:
     name:
       - git
       - wget
       - go
+  become: yes
+  become_user: root
+- name: Checks if docker exists
+  stat:
+    path: /usr/bin/docker
+  register: hasDocker
+- name: Checks if docker-compose exists
+  stat:
+    path: /usr/bin/docker-compose
+  register: hasDockerCompose
+- name: Checks if data file exists
+  stat:
+    path: /home/ec2-user/data.tsv
+  register: hasData
 - name: Install Docker
   command: /usr/bin/amazon-linux-extras install docker
+  become: yes
+  become_user: root
+  when: hasDocker == False
+- name: Giving ec2-user access to docker
+  command: /usr/sbin/usermod -a -G docker ec2-user
+  become: yes
+  become_user: root
+  when: hasDocker == False
+- name: Getting the docker-compose pkg
+  command: /usr/bin/curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-Linux-x86_64" -o /usr/bin/docker-compose
+  become: yes
+  become_user: root
+  when: hasDockerCompose == False
+- name: Enabling docker-compose to execute
+  command: /usr/bin/chmod +x /usr/bin/docker-compose
+  become: yes
+  become_user: root
+  when: hasDockerCompose == False
+- name: Download data file
+  command: /usr/bin/wget https://datasets.imdbws.com/name.basics.tsv.gz
+  when: hasData == False
+- name: Extract the data file
+  command: /usr/bin/gzip -d /home/ec2-user/name.basics.tsv.gz
+  when: hasData == False
+- name: Rename the data file
+  command: /usr/bin/mv /home/ec2-user/name.basics.tsv /home/ec2-user/data.tsv
+  when: hasData == False
+- name: Copying Producer script file
+  copy:
+    src: producer.go
+    dest: /home/ec2-user/producer.go
+  become: yes
+  become_user: root
+- name: Copying Producer Service file
+  copy:
+    src: producer.service
+    dest: /etc/systemd/system/producer.service
+  become: yes
+  become_user: root
+- name: Copying Docker compose yaml file
+  copy:
+    src: docker-compose.yml
+    dest: /home/ec2-user/docker-compose.yml
+  become: yes
+  become_user: root
+- name: Copying Kafka service file
+  copy:
+    src: kafka.service
+    dest: /etc/systemd/system/kafka.service
+  become: yes
+  become_user: root
+- name: Installing Necessary Go Libraries kafka
+  command: /usr/bin/go get -u -v gopkg.in/confluentinc/confluent-kafka-go.v1/kafka
   become: yes
   become_user: root
 - name: Configure Docker
@@ -21,40 +89,12 @@
     name: docker
     enabled: yes
     state: started
-- name: Giving ec2-user access to docker
-  command: /usr/sbin/usermod -a -G docker ec2-user
   become: yes
   become_user: root
-  become_method: su
-- name: Getting the docker-compose pkg
-  command: /usr/bin/curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/bin/docker-compose
+- name: Start and Enable Producer Service
+  service:
+    name: producer
+    enabled: yes
+    state: started
   become: yes
   become_user: root
-  become_methos: su
-- name: Enabling docker-compose to execute
-  command: /usr/bin/chmod +x /usr/bin/docker-compose
-  become: yes
-  become_user: root
-  become_method: su
-- name: Download data file
-  command: /usr/bin/wget https://datasets.imdbws.com/name.basics.tsv.gz
-- name: Extract the data file
-  command: /usr/bin/gzip -d /home/ec2-user/name.basics.tsv.gz
-- name: Rename the data file
-  command: /usr/bin/mv /home/ec2-user/name.basics.tsv /home/ec2-user/data.tsv
-- name: Copying Producer script file
-  copy:
-    src: producer.go
-    dest: /home/ec2-user/producer.go
-- name: Copying Producer Service file
-  copy:
-    src: producer.service
-    dest: /etc/systemd/system/producer.service
-- name: Copying Docker compose yaml file
-  copy:
-    src: docker-compose.yml
-    dest: /home/ec2-user/docker-compose.yml
-- name: Copying Kafka service file
-  copy:
-    src: kafka.service
-    dest: /etc/systemd/system/kafka.service
