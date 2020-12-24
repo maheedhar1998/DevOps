@@ -1,3 +1,20 @@
 - hosts: kafka
   roles:
     - role: './roles/kafka/'
+  environment:
+    GOPATH: "/home/ec2-user/go"
+- hosts: webserver1
+  roles:
+    - role: './roles/webserver/'
+      vars:
+        webserver_num: 1
+- hosts: webserver2
+  roles:
+    - role: './roles/webserver/'
+      vars:
+        webserver_num: 2
+- hosts: webserver2
+  roles:
+    - role: './roles/webserver/'
+      vars:
+        webserver_num: 3

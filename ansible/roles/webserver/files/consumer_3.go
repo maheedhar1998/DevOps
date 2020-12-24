@@ -24,17 +24,22 @@ var artists []artist
 
 // Retrieves messages from kafka
 func getFromKafka(cons *kafka.Consumer) (string, bool) {
-	fmt.Println("Reading From Kafka....")
-	tm, tmErr := time.ParseDuration("5s")
-	fmt.Println(tmErr)
-	line, err := cons.ReadMessage(tm)
-	fmt.Printf("%v, %T, %v, %T", line, line, err, err)
-	if err == nil {
-		return string(line.Value), true
-	} else {
-		fmt.Println(err)
-		return "", false
+	read := false
+	for !read {
+		fmt.Println("Reading From Kafka....")
+		tm, tmErr := time.ParseDuration("5s")
+		fmt.Println(tmErr)
+		line, err := cons.ReadMessage(tm)
+		fmt.Printf("%v, %T, %v, %T", line, line, err, err)
+		if err == nil {
+			return string(line.Value), true
+			read = true
+		} else {
+			fmt.Println(err)
+			return "", false
+		}
 	}
+	return "", false
 }
 
 // Adds artists to the list
@@ -119,9 +124,9 @@ func searchArtistByProfession(w http.ResponseWriter, r *http.Request) {
 func main() {
 	// Consumer Init
 	c, kafErr := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers": "localhost:9092",
+		"bootstrap.servers": "34.238.242.158:9092",
 		"auto.offset.reset": "earliest",
-		"group.id":          "myGroup",
+		"group.id":          "myGroup_3",
 	})
 	if kafErr != nil {
 		fmt.Println("Consumer wasn't initialized")

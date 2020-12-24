@@ -143,6 +143,17 @@ module "bastion_sg_rule_4" {
   source_sg_id = module.security_group_sub2.security_group_id
 }
 
+module "bastion_sg_rule_5" {
+  source = "../../modules/security_group_rule"
+  source_sg = false
+  type = "ingress"
+  from_port = 22
+  to_port = 22
+  protocol = "tcp"
+  security_group_id = module.security_group_bastion.security_group_id
+  cidr_blocks = ["173.93.172.128/32"]
+}
+
 module "route_table_sub_1" {
   source = "../../modules/route_table"
   name = "public-route-table"

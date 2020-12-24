@@ -1,5 +1,2 @@
 ---
 # vars file for kafka
-# environment:
-#   GOPATH: /home/ec2-user/
-#   GOROOT: /home/ec2-user/
