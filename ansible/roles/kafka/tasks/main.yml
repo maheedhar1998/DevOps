@@ -28,7 +28,7 @@
     path: /home/ec2-user/data.tsv
   register: hasData
 - name: Install Docker
-  command: /usr/bin/amazon-linux-extras install docker
+  command: /usr/bin/amazon-linux-extras install docker -y
   become: yes
   become_user: root
   when: hasDocker == False

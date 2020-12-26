@@ -6,15 +6,18 @@
 - hosts: webserver1
   roles:
     - role: './roles/webserver/'
-      vars:
-        webserver_num: 1
+  vars:
+    webserver_num: 1
 - hosts: webserver2
   roles:
     - role: './roles/webserver/'
-      vars:
-        webserver_num: 2
-- hosts: webserver2
+  vars:
+    webserver_num: 2
+- hosts: webserver3
   roles:
     - role: './roles/webserver/'
-      vars:
-        webserver_num: 3
+  vars:
+    webserver_num: 3
+- hosts: bastion
+  roles:
+    - role: './roles/bastion/'

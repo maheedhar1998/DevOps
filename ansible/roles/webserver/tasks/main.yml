@@ -16,26 +16,29 @@
   become: yes
   become_user: root
 - name: Install Nginx
-  command: /usr/bin/amazon-linux-extras install nginx1
+  command: /usr/bin/amazon-linux-extras install nginx1 -y
   become: yes
   become_user: root
-- name: Overwrite the Server index.html file
+- name: Overwrite the Server 1 index.html file
   copy:
     src: index_1.html
     dest: /usr/share/nginx/html/index.html
-    remote_src: yes
+  become: yes
+  become_user: root
   when: webserver_num == 1
-- name: Overwrite the Server index.html file
+- name: Overwrite the Server 2 index.html file
   copy:
     src: index_2.html
     dest: /usr/share/nginx/html/index.html
-    remote_src: yes
+  become: yes
+  become_user: root
   when: webserver_num == 2
-- name: Overwrite the Server index.html file
+- name: Overwrite the Server 3 index.html file
   copy:
     src: index_3.html
     dest: /usr/share/nginx/html/index.html
-    remote_src: yes
+  become: yes
+  become_user: root
   when: webserver_num == 3
 - name: Start Nginx Server
   service:
@@ -48,19 +51,16 @@
   copy:
     src: consumer_1.go
     dest: /home/ec2-user/consumer.go
-    remote_src: yes
   when: webserver_num == 1
 - name: Overwrite the Server 2 consumer.go file
   copy:
     src: consumer_2.go
     dest: /home/ec2-user/consumer.go
-    remote_src: yes
   when: webserver_num == 2
 - name: Overwrite the Server 3 consumer.go file
   copy:
     src: consumer_3.go
     dest: /home/ec2-user/consumer.go
-    remote_src: yes
   when: webserver_num == 3
 - name: Copy the consumer servie file
   copy:
