@@ -3,6 +3,7 @@
     - role: './roles/kafka/'
   environment:
     GOPATH: "/home/ec2-user/go"
+    # GOROOT: "/root/go"
 - hosts: webserver1
   roles:
     - role: './roles/webserver/'

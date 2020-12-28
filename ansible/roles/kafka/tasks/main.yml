@@ -84,6 +84,9 @@
   command: /usr/bin/go get -u -v gopkg.in/confluentinc/confluent-kafka-go.v1/kafka
   become: yes
   become_user: root
+  environment:
+    GOPATH: "/home/ec2-user/go"
+    # GOROOT: "/root/go"
 - name: Configure Docker
   service:
     name: docker

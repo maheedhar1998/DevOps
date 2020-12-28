@@ -80,17 +80,6 @@ module "security_group_1_rule_3" {
   ipv6_cidr_blocks = ["::/0"]
 }
 
-module "security_group_1_rule_4" {
-  source = "../../modules/security_group_rule"
-  source_sg = true
-  type = "ingress"
-  from_port = 6969
-  to_port = 6969
-  protocol = "tcp"
-  security_group_id = module.security_group_sub1.security_group_id
-  source_sg_id = module.security_group_sub2.security_group_id
-}
-
 module "security_group_bastion" {
   source = "../../modules/security_group"
   sg_description = "Bastion-dev-sg"
@@ -133,17 +122,6 @@ module "bastion_sg_rule_3" {
 }
 
 module "bastion_sg_rule_4" {
-  source = "../../modules/security_group_rule"
-  source_sg = true
-  type = "ingress"
-  from_port = 6969
-  to_port = 6969
-  protocol = "tcp"
-  security_group_id = module.security_group_bastion.security_group_id
-  source_sg_id = module.security_group_sub2.security_group_id
-}
-
-module "bastion_sg_rule_5" {
   source = "../../modules/security_group_rule"
   source_sg = false
   type = "ingress"
@@ -242,6 +220,28 @@ module "security_group_2_rule_5" {
   type = "ingress"
   from_port = 22
   to_port = 22
+  protocol = "tcp"
+  security_group_id = module.security_group_sub2.security_group_id
+  source_sg_id = module.security_group_bastion.security_group_id
+}
+
+module "security_group_2_rule_6" {
+  source = "../../modules/security_group_rule"
+  source_sg = true
+  type = "ingress"
+  from_port = 8180
+  to_port = 8180
+  protocol = "tcp"
+  security_group_id = module.security_group_sub2.security_group_id
+  source_sg_id = module.security_group_sub1.security_group_id
+}
+
+module "security_group_2_rule_7" {
+  source = "../../modules/security_group_rule"
+  source_sg = true
+  type = "ingress"
+  from_port = 8180
+  to_port = 8180
   protocol = "tcp"
   security_group_id = module.security_group_sub2.security_group_id
   source_sg_id = module.security_group_bastion.security_group_id
@@ -417,6 +417,43 @@ module "load_balancer_listener" {
   source = "../../modules/lb_listener"
   load_balancer_arn = module.load_balancer.load_balancer_arn
   port = 80
+  protocol = "HTTP"
+  target_group_arn = module.load_balancer_target_group.target_group_arn
+}
+
+module "data_api_load_balancer_target_group" {
+  source = "../../modules/lb_target_group"
+  name = "data-api-dev-target-group"
+  port = 8180
+  protocol = "HTTP"
+  health_check_protocol = "HTTP"
+  vpc_id = module.VPC.vpc_id
+  target_type = "instance"
+  lb_algorithm = "round_robin"
+}
+
+module "data_api_lb_target_group_attachment" {
+  source = "../../modules/lb_target_attachment"
+  target_group_arn = module.load_balancer_target_group.target_group_arn
+  target_ids = module.ec2_webserver.instance_ids
+  port = 8180
+}
+
+module "data_api_load_balancer" {
+  source = "../../modules/load_balancer"
+  name = "api-application-lb-dev"
+  internal = false
+  lb_type = "application"
+  subnets = [module.subnet_1.subnet_id, module.subnet_2.subnet_id]
+  security_groups = [module.security_group_sub1.security_group_id]
+  log_bucket = module.s3.bucket_name
+  s3_prefix = "API_ALB_Logs_"
+}
+
+module "data_api_load_balancer_listener" {
+  source = "../../modules/lb_listener"
+  load_balancer_arn = module.load_balancer.load_balancer_arn
+  port = 8180
   protocol = "HTTP"
   target_group_arn = module.load_balancer_target_group.target_group_arn
 }
