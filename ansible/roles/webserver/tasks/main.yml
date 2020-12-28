@@ -49,18 +49,21 @@
   become_user: root
 - name: Overwrite the Server 1 consumer.go file
   copy:
-    src: consumer_1.go
-    dest: /home/ec2-user/consumer.go
+    src: consumer_1
+    dest: /home/ec2-user/consumer
+    mode: u+rwx,g+rwx,o+rwx
   when: webserver_num == 1
 - name: Overwrite the Server 2 consumer.go file
   copy:
-    src: consumer_2.go
-    dest: /home/ec2-user/consumer.go
+    src: consumer_2
+    dest: /home/ec2-user/consumer
+    mode: u+rwx,g+rwx,o+rwx
   when: webserver_num == 2
 - name: Overwrite the Server 3 consumer.go file
   copy:
-    src: consumer_3.go
-    dest: /home/ec2-user/consumer.go
+    src: consumer_3
+    dest: /home/ec2-user/consumer
+    mode: u+rwx,g+rwx,o+rwx
   when: webserver_num == 3
 - name: Copy the consumer servie file
   copy:
@@ -68,18 +71,14 @@
     dest: /etc/systemd/system/consumer.service
   become: yes
   become_user: root
-- name: Installing Necessary Go Libraries kafka
-  command: /usr/bin/go get -u -v gopkg.in/confluentinc/confluent-kafka-go.v1/kafka
-  become: yes
-  become_user: root
-- name: Installing Necessary Go Libraries kafka
-  command: /usr/bin/go get -u -v github.com/gorilla/mux
-  become: yes
-  become_user: root
 - name: Start Consumer service
   service:
     name: consumer
     enabled: yes
     state: started
+  become: yes
+  become_user: root
+- name: Reload Service Daemons in case of update
+  command: /usr/bin/systemctl daemon-reload
   become: yes
   become_user: root

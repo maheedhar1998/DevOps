@@ -56,10 +56,11 @@
 - name: Rename the data file
   command: /usr/bin/mv /home/ec2-user/name.basics.tsv /home/ec2-user/data.tsv
   when: hasData == False
-- name: Copying Producer script file
+- name: Copying Producer binary file
   copy:
-    src: producer.go
-    dest: /home/ec2-user/producer.go
+    src: producer
+    dest: /home/ec2-user/producer
+    mode: u+rwx,g+rwx,o+rwx
   become: yes
   become_user: root
 - name: Copying Producer Service file
@@ -80,13 +81,6 @@
     dest: /etc/systemd/system/kafka.service
   become: yes
   become_user: root
-- name: Installing Necessary Go Libraries kafka
-  command: /usr/bin/go get -u -v gopkg.in/confluentinc/confluent-kafka-go.v1/kafka
-  become: yes
-  become_user: root
-  environment:
-    GOPATH: "/home/ec2-user/go"
-    # GOROOT: "/root/go"
 - name: Configure Docker
   service:
     name: docker
@@ -99,5 +93,9 @@
     name: producer
     enabled: yes
     state: started
+  become: yes
+  become_user: root
+- name: Reload Service Daemons in case of update
+  command: /usr/bin/systemctl daemon-reload
   become: yes
   become_user: root

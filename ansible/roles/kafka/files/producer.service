@@ -2,5 +2,5 @@
 Description=Kafka Producer Service
 
 [Service]
-ExecStart=/usr/bin/go run producer.go
+ExecStart=/home/ec2-user/producer
 WorkingDirectory=/home/ec2-user/

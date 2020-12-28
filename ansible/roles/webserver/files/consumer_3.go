@@ -124,7 +124,7 @@ func searchArtistByProfession(w http.ResponseWriter, r *http.Request) {
 func main() {
 	// Consumer Init
 	c, kafErr := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers": "34.238.242.158:9092",
+		"bootstrap.servers": "10.11.2.146:9092",
 		"auto.offset.reset": "earliest",
 		"group.id":          "myGroup_3",
 	})
