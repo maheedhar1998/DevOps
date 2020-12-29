@@ -5,80 +5,74 @@
     name: "*"
     state: latest
     update_only: yes
-  become: yes
-  become_user: root
+
 - name: Install git, wget, go, 
   yum:
     name:
       - git
       - wget
       - go
-  become: yes
-  become_user: root
+
 - name: Install Nginx
   command: /usr/bin/amazon-linux-extras install nginx1 -y
-  become: yes
-  become_user: root
+
 - name: Overwrite the Server 1 index.html file
   copy:
     src: index_1.html
     dest: /usr/share/nginx/html/index.html
-  become: yes
-  become_user: root
   when: webserver_num == 1
+
 - name: Overwrite the Server 2 index.html file
   copy:
     src: index_2.html
     dest: /usr/share/nginx/html/index.html
-  become: yes
-  become_user: root
   when: webserver_num == 2
+
 - name: Overwrite the Server 3 index.html file
   copy:
     src: index_3.html
     dest: /usr/share/nginx/html/index.html
-  become: yes
-  become_user: root
   when: webserver_num == 3
+
 - name: Start Nginx Server
   service:
     name: nginx
     enabled: yes
     state: started
-  become: yes
-  become_user: root
+
 - name: Overwrite the Server 1 consumer.go file
   copy:
-    src: consumer_1
-    dest: /home/ec2-user/consumer
-    mode: u+rwx,g+rwx,o+rwx
+    src: consumer_1.go
+    dest: /home/ec2-user/consumer.go
   when: webserver_num == 1
+
 - name: Overwrite the Server 2 consumer.go file
   copy:
-    src: consumer_2
-    dest: /home/ec2-user/consumer
-    mode: u+rwx,g+rwx,o+rwx
+    src: consumer_2.go
+    dest: /home/ec2-user/consumer.go
   when: webserver_num == 2
+
 - name: Overwrite the Server 3 consumer.go file
   copy:
-    src: consumer_3
-    dest: /home/ec2-user/consumer
-    mode: u+rwx,g+rwx,o+rwx
+    src: consumer_3.go
+    dest: /home/ec2-user/consumer.go
   when: webserver_num == 3
+
+- name: Build the Consumer GO Binary
+  command:
+    cmd: /usr/bin/go build consumer.go
+    chdir: /home/ec2-user/
+
 - name: Copy the consumer servie file
   copy:
     src: consumer.service
     dest: /etc/systemd/system/consumer.service
-  become: yes
-  become_user: root
+
 - name: Start Consumer service
   service:
     name: consumer
     enabled: yes
     state: started
-  become: yes
-  become_user: root
+
 - name: Reload Service Daemons in case of update
   command: /usr/bin/systemctl daemon-reload
-  become: yes
-  become_user: root

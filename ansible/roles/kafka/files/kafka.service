@@ -2,5 +2,5 @@
 Description=Kafka Docker container service
 
 [Service]
-ExecStart=/usr/bin/docker-compose -f docker-compose.yml up
+ExecStart=kafka_2.13-2.7.0/bin/kafka-server-start.sh kafka_2.13-2.7.0/config/server.properties
 WorkingDirectory=/home/ec2-user/

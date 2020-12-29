@@ -26,3 +26,7 @@ variable "lb_algorithm" {
   type = string
   description = "Load Balancing Algorithm Type"
 }
+variable "path" {
+  type = string
+  description = "The Path to check for the health check"
+}

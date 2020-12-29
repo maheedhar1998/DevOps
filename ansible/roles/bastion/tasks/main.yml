@@ -5,13 +5,10 @@
     name: "*"
     state: latest
     update_only: yes
-  become: yes
-  become_user: root
-- name: Install git, wget,
+
+- name: Install git, wget, go, 
   yum:
     name:
       - git
       - wget
-    state: latest
-  become: yes
-  become_user: root
+      - go

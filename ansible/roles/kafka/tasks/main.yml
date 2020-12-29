@@ -5,97 +5,65 @@
     name: "*"
     state: latest
     update_only: yes
-  become: yes
-  become_user: root
+
 - name: Install git, wget, go, 
   yum:
     name:
       - git
       - wget
       - go
-  become: yes
-  become_user: root
-- name: Checks if docker exists
+
+- name: check kafka binaries
   stat:
-    path: /usr/bin/docker
-  register: hasDocker
-- name: Checks if docker-compose exists
-  stat:
-    path: /usr/bin/docker-compose
-  register: hasDockerCompose
-- name: Checks if data file exists
-  stat:
-    path: /home/ec2-user/data.tsv
-  register: hasData
-- name: Install Docker
-  command: /usr/bin/amazon-linux-extras install docker -y
-  become: yes
-  become_user: root
-  when: hasDocker == False
-- name: Giving ec2-user access to docker
-  command: /usr/sbin/usermod -a -G docker ec2-user
-  become: yes
-  become_user: root
-  when: hasDocker == False
-- name: Getting the docker-compose pkg
-  command: /usr/bin/curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-Linux-x86_64" -o /usr/bin/docker-compose
-  become: yes
-  become_user: root
-  when: hasDockerCompose == False
-- name: Enabling docker-compose to execute
-  command: /usr/bin/chmod +x /usr/bin/docker-compose
-  become: yes
-  become_user: root
-  when: hasDockerCompose == False
-- name: Download data file
-  command: /usr/bin/wget https://datasets.imdbws.com/name.basics.tsv.gz
-  when: hasData == False
-- name: Extract the data file
-  command: /usr/bin/gzip -d /home/ec2-user/name.basics.tsv.gz
-  when: hasData == False
-- name: Rename the data file
-  command: /usr/bin/mv /home/ec2-user/name.basics.tsv /home/ec2-user/data.tsv
-  when: hasData == False
-- name: Copying Producer binary file
-  copy:
-    src: producer
-    dest: /home/ec2-user/producer
-    mode: u+rwx,g+rwx,o+rwx
-  become: yes
-  become_user: root
-- name: Copying Producer Service file
-  copy:
-    src: producer.service
-    dest: /etc/systemd/system/producer.service
-  become: yes
-  become_user: root
-- name: Copying Docker compose yaml file
-  copy:
-    src: docker-compose.yml
-    dest: /home/ec2-user/docker-compose.yml
-  become: yes
-  become_user: root
+    path: /home/ec2-user/kafka_2.13-2.7.0.tgz
+  register: downloadedBinaries
+
+- name: Downloading Kafka Binaries
+  get_url:
+    url: https://mirror.olnevhost.net/pub/apache/kafka/2.7.0/kafka_2.13-2.7.0.tgz
+    dest: /home/ec2-user
+  when: downloadedBinaries == False
+
+- name: Extract the Kafka Binaries
+  command:
+    cmd: /usr/bin/tar -xvf kafka_2.13-2.7.0.tgz
+    chdir: /home/ec2-user
+
+- name: Create the neccessary directory
+  command:
+    cmd: /usr/bin/mkdir -p data/kafka data/zookeeper
+    chdir: /home/ec2-user/kafka_2.13-2.7.0/
+
+- name: Modifying the server.properties log.dirs
+  lineinfile:
+    path: /home/ec2-user/kafka_2.13-2.7.0/config/server.properties
+    regexp: '^log.dirs='
+    line: log.dirs=/home/ec2-user/kafka_2.13-2.7.0/data/kafka
+
+- name: Modifying the server.properties zookeeper connect server
+  lineinfile:
+    path: /home/ec2-user/kafka_2.13-2.7.0/config/server.properties
+    regexp: '^zookeeper.connect='
+    line: zookeeper.connect=10.11.2.159:2181
+
+- name: Installing Java enabling yum repo
+  command: /usr/bin/amazon-linux-extras enable corretto8
+
+- name: Installing Java installing
+  yum:
+    name: java-1.8.0-amazon-corretto
+    state: present
+
 - name: Copying Kafka service file
   copy:
     src: kafka.service
     dest: /etc/systemd/system/kafka.service
-  become: yes
-  become_user: root
-- name: Configure Docker
+  notify:
+    - Reload Daemons
+    - Restart Kafka Service
+
+- name: Start and Enable Kafka Service
   service:
-    name: docker
+    name: kafka
     enabled: yes
     state: started
-  become: yes
-  become_user: root
-- name: Start and Enable Producer Service
-  service:
-    name: producer
-    enabled: yes
-    state: started
-  become: yes
-  become_user: root
-- name: Reload Service Daemons in case of update
-  command: /usr/bin/systemctl daemon-reload
-  become: yes
-  become_user: root

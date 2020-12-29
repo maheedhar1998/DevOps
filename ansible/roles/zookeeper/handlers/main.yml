@@ -1,0 +1,26 @@
+---
+# handlers file for zookeeper
+- name: Restart Kafka Service
+  service:
+    name: kafka
+    state: restarted
+
+- name: Restart Zookeeper Service
+  service:
+    name: zookeeper
+    state: restarted
+
+- name: Restart Producer Service
+  service:
+    name: producer
+    state: restarted
+
+- name: Restart Docker Service
+  service:
+    name: docker
+    state: restarted
+
+- name: Reload Daemons
+  command: /usr/bin/systemctl daemon-reload
+  become: yes
+  become_user: root

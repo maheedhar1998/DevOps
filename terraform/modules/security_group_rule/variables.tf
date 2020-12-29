@@ -27,6 +27,11 @@ variable "source_sg" {
   type = bool
   description = "Whether the source is Security Group or a CIDR block"
 }
+variable "source_self" {
+  type = bool
+  description = "Whether the source is the self security group or not"
+  default = false
+}
 variable "cidr_blocks" {
   type = list(string)
   description = "A List of Source IPv4 CIDR Blocks"

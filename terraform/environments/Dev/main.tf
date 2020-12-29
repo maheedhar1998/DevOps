@@ -247,6 +247,17 @@ module "security_group_2_rule_7" {
   source_sg_id = module.security_group_bastion.security_group_id
 }
 
+module "security_group_2_rule_8" {
+  source = "../../modules/security_group_rule"
+  source_sg = false
+  source_self = true
+  type = "ingress"
+  from_port = -1
+  to_port = -1
+  protocol = "icmp"
+  security_group_id = module.security_group_sub2.security_group_id
+}
+
 module "route_table_sub_2" {
   source = "../../modules/route_table"
   name = "webserver-route-table"
@@ -350,10 +361,21 @@ module "ec2_webserver" {
 
 module "ec2_kafka_server" {
   source = "../../modules/ec2/red_hat"
-  number_of_instances = 1
+  number_of_instances = 2
   subnet_id = module.subnet_2.subnet_id
   name = "kafka-server-dev"
-  instance_type = "t2.large"
+  instance_type = "t2.micro"
+  vpc_security_group_ids = [module.security_group_sub2.security_group_id]
+  key_name = "my-ssh-key"
+  iam_instance_profile = module.iam_ec2_webserver_instance_profile.name
+}
+
+module "ec2_zookeeper_server" {
+  source = "../../modules/ec2/red_hat"
+  number_of_instances = 1
+  subnet_id = module.subnet_2.subnet_id
+  name = "zookeeper-server-dev"
+  instance_type = "t2.micro"
   vpc_security_group_ids = [module.security_group_sub2.security_group_id]
   key_name = "my-ssh-key"
   iam_instance_profile = module.iam_ec2_webserver_instance_profile.name
@@ -390,6 +412,7 @@ module "load_balancer_target_group" {
   port = 80
   protocol = "HTTP"
   health_check_protocol = "HTTP"
+  path = "/"
   vpc_id = module.VPC.vpc_id
   target_type = "instance"
   lb_algorithm = "round_robin"
@@ -427,6 +450,7 @@ module "data_api_load_balancer_target_group" {
   port = 8180
   protocol = "HTTP"
   health_check_protocol = "HTTP"
+  path = "/search/ByName/a"
   vpc_id = module.VPC.vpc_id
   target_type = "instance"
   lb_algorithm = "round_robin"
@@ -434,7 +458,7 @@ module "data_api_load_balancer_target_group" {
 
 module "data_api_lb_target_group_attachment" {
   source = "../../modules/lb_target_attachment"
-  target_group_arn = module.load_balancer_target_group.target_group_arn
+  target_group_arn = module.data_api_load_balancer_target_group.target_group_arn
   target_ids = module.ec2_webserver.instance_ids
   port = 8180
 }
@@ -452,8 +476,8 @@ module "data_api_load_balancer" {
 
 module "data_api_load_balancer_listener" {
   source = "../../modules/lb_listener"
-  load_balancer_arn = module.load_balancer.load_balancer_arn
-  port = 8180
+  load_balancer_arn = module.data_api_load_balancer.load_balancer_arn
+  port = 80
   protocol = "HTTP"
-  target_group_arn = module.load_balancer_target_group.target_group_arn
+  target_group_arn = module.data_api_load_balancer_target_group.target_group_arn
 }

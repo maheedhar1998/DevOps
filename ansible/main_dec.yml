@@ -1,23 +1,43 @@
-- hosts: kafka
-  roles:
-    - role: './roles/kafka/'
-  environment:
-    GOPATH: "/home/ec2-user/go"
 - hosts: webserver1
+  become: yes
+  become_user: root
   roles:
     - role: './roles/webserver/'
   vars:
     webserver_num: 1
+
 - hosts: webserver2
+  become: yes
+  become_user: root
   roles:
     - role: './roles/webserver/'
   vars:
     webserver_num: 2
+
 - hosts: webserver3
+  become: yes
+  become_user: root
   roles:
     - role: './roles/webserver/'
   vars:
     webserver_num: 3
+
 - hosts: bastion
+  become: yes
+  become_user: root
   roles:
     - role: './roles/bastion/'
+
+- hosts: kafka
+  become: yes
+  become_user: root
+  roles:
+    - role: './roles/kafka/'
+  environment:
+    GOPATH: "/home/ec2-user/go"
+
+- hosts: zookeeper
+  become: yes
+  become_user: root
+  roles:
+    - role: './roles/zookeeper'

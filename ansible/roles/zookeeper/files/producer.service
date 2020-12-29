@@ -1,0 +1,6 @@
+[Unit]
+Description=Kafka Producer Service
+
+[Service]
+ExecStart=/home/ec2-user/producer
+WorkingDirectory=/home/ec2-user/

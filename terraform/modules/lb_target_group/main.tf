@@ -12,5 +12,6 @@ resource "aws_lb_target_group" "lb_target" {
     port = var.port
     protocol = var.health_check_protocol
     # timeout = 4
+    path = var.path
   }
 }
