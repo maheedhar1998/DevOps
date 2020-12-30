@@ -4,13 +4,25 @@
   roles:
     - role: './roles/zookeeper'
 
-- hosts: kafka
+- hosts: kafka_host1
   become: yes
   become_user: root
   roles:
     - role: './roles/kafka/'
   environment:
     GOPATH: "/home/ec2-user/go"
+  vars:
+    broker_num: 1
+
+- hosts: kafka_host2
+  become: yes
+  become_user: root
+  roles:
+    - role: './roles/kafka/'
+  environment:
+    GOPATH: "/home/ec2-user/go"
+  vars:
+    broker_num: 2
 
 - hosts: webserver1
   become: yes
