@@ -22,12 +22,13 @@
   get_url:
     url: https://mirror.olnevhost.net/pub/apache/kafka/2.7.0/kafka_2.13-2.7.0.tgz
     dest: /home/ec2-user
-  when: downloadedBinaries == False
+  when: downloadedBinaries.stat.exists == False
 
 - name: Extract the Kafka Binaries
   command:
     cmd: /usr/bin/tar -xvf kafka_2.13-2.7.0.tgz
     chdir: /home/ec2-user
+  when: downloadedBinaries.stat.exists == False
 
 - name: Create the neccessary directory
   command:

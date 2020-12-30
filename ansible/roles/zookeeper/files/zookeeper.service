@@ -2,5 +2,5 @@
 Description=Kafka Docker container service
 
 [Service]
-ExecStart=kafka_2.13-2.7.0/bin/zookeeper-server-start.sh kafka_2.13-2.7.0/config/zookeeper.properties
+ExecStart=/home/ec2-user/kafka_2.13-2.7.0/bin/zookeeper-server-start.sh kafka_2.13-2.7.0/config/zookeeper.properties
 WorkingDirectory=/home/ec2-user/

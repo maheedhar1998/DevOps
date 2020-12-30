@@ -21,58 +21,63 @@
     src: index_1.html
     dest: /usr/share/nginx/html/index.html
   when: webserver_num == 1
+  notify:
+    - Restart Nginx Service
 
 - name: Overwrite the Server 2 index.html file
   copy:
     src: index_2.html
     dest: /usr/share/nginx/html/index.html
   when: webserver_num == 2
+  notify:
+    - Restart Nginx Service
 
 - name: Overwrite the Server 3 index.html file
   copy:
     src: index_3.html
     dest: /usr/share/nginx/html/index.html
   when: webserver_num == 3
+  notify:
+    - Restart Nginx Service
 
-- name: Start Nginx Server
-  service:
-    name: nginx
-    enabled: yes
-    state: started
+- name: Installing Necessary Go Libraries
+  command:
+    cmd: /usr/bin/go get -u -v gopkg.in/confluentinc/confluent-kafka-go.v1/kafka
+    chdir: /home/ec2-user
+
+- name: Installing Necessary Go Libraries
+  command:
+    cmd: /usr/bin/go get -u -v github.com/gorilla/mux
+    chdir: /home/ec2-user
 
 - name: Overwrite the Server 1 consumer.go file
   copy:
     src: consumer_1.go
     dest: /home/ec2-user/consumer.go
   when: webserver_num == 1
+  notify:
+    - Build Consumer Go Binary
 
 - name: Overwrite the Server 2 consumer.go file
   copy:
     src: consumer_2.go
     dest: /home/ec2-user/consumer.go
   when: webserver_num == 2
+  notify:
+    - Build Consumer Go Binary
 
 - name: Overwrite the Server 3 consumer.go file
   copy:
     src: consumer_3.go
     dest: /home/ec2-user/consumer.go
   when: webserver_num == 3
-
-- name: Build the Consumer GO Binary
-  command:
-    cmd: /usr/bin/go build consumer.go
-    chdir: /home/ec2-user/
+  notify:
+    - Build Consumer Go Binary
 
 - name: Copy the consumer servie file
   copy:
     src: consumer.service
     dest: /etc/systemd/system/consumer.service
-
-- name: Start Consumer service
-  service:
-    name: consumer
-    enabled: yes
-    state: started
-
-- name: Reload Service Daemons in case of update
-  command: /usr/bin/systemctl daemon-reload
+  notify:
+    - Reload Daemons
+    - Restart Consumer Service

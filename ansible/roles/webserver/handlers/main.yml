@@ -1,2 +1,23 @@
 ---
 # handlers file for webserver
+- name: Restart Consumer Service
+  service:
+    name: consumer
+    state: restarted
+
+- name: Reload Daemons
+  command: /usr/bin/systemctl daemon-reload
+  become: yes
+  become_user: root
+
+- name: Build Consumer Go Binary
+  command:
+    cmd: /usr/bin/go build consumer.go
+    chdir: /home/ec2-user/
+  become: yes
+  become_user: root
+
+- name: Restart Nginx Service
+  service:
+    name: nginx
+    state: restarted

@@ -1,3 +1,17 @@
+- hosts: zookeeper
+  become: yes
+  become_user: root
+  roles:
+    - role: './roles/zookeeper'
+
+- hosts: kafka
+  become: yes
+  become_user: root
+  roles:
+    - role: './roles/kafka/'
+  environment:
+    GOPATH: "/home/ec2-user/go"
+
 - hosts: webserver1
   become: yes
   become_user: root
@@ -27,17 +41,3 @@
   become_user: root
   roles:
     - role: './roles/bastion/'
-
-- hosts: kafka
-  become: yes
-  become_user: root
-  roles:
-    - role: './roles/kafka/'
-  environment:
-    GOPATH: "/home/ec2-user/go"
-
-- hosts: zookeeper
-  become: yes
-  become_user: root
-  roles:
-    - role: './roles/zookeeper'

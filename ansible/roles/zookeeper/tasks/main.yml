@@ -13,19 +13,37 @@
       - wget
       - go
 
+- name: Check if Data is there
+  stat:
+    path: /home/ec2-user/data.tsv
+  register: hasData
+
+- name: check kafka binaries
+  stat:
+    path: /home/ec2-user/kafka_2.13-2.7.0.tgz
+  register: downloadedBinaries
+
 - name: Download data file
   command: /usr/bin/wget https://datasets.imdbws.com/name.basics.tsv.gz
-  when: hasData == False
+  when: hasData.stat.exists == False
 
 - name: Extract the data file
   command: /usr/bin/gzip -d /home/ec2-user/name.basics.tsv.gz
-  when: hasData == False
+  when: hasData.stat.exists == False
 
 - name: Rename the data file
   command: /usr/bin/mv /home/ec2-user/name.basics.tsv /home/ec2-user/data.tsv
-  when: hasData == False
+  when: hasData.stat.exists == False
 
-- name: Copying Producer binary file
+- name: Installing Java enabling yum repo
+  command: /usr/bin/amazon-linux-extras enable corretto8
+
+- name: Installing Java installing
+  yum:
+    name: java-1.8.0-amazon-corretto
+    state: present
+
+- name: Copying Producer Go file
   copy:
     src: producer.go
     dest: /home/ec2-user/producer.go
@@ -44,21 +62,23 @@
     dest: /etc/systemd/system/producer.service
   notify:
     - Reload Daemons
-    - Restart Producer service
+    - Restart Producer Service
 
 - name: Downloading Kafka Binaries
   get_url:
     url: https://mirror.olnevhost.net/pub/apache/kafka/2.7.0/kafka_2.13-2.7.0.tgz
     dest: /home/ec2-user
+  when: downloadedBinaries.stat.exists == False
 
 - name: Extract the Kafka Binaries
   command:
-    cmd: /usr/bin/tar -xvzf kafka_2.13-2.7.0.tgz
+    cmd: /usr/bin/tar -xvf kafka_2.13-2.7.0.tgz
     chdir: /home/ec2-user
+  when: downloadedBinaries.stat.exists == False
 
 - name: Create the neccessary directory
   command:
-    cmd: /usr/bin/mkdir data/kafka data/zookeeper
+    cmd: /usr/bin/mkdir -p data/kafka data/zookeeper
     chdir: /home/ec2-user/kafka_2.13-2.7.0/
 
 - name: Modifying the zookeeper.properties
@@ -79,7 +99,7 @@
     dest: /etc/systemd/system/kafka.service
   notify:
     - Reload Daemons
-    - Restart Kafka service
+    - Restart Kafka Service
 
 - name: Copying Zookeeper service file
   copy:
@@ -87,7 +107,7 @@
     dest: /etc/systemd/system/zookeeper.service
   notify:
     - Reload Daemons
-    - Restart Zookeeper service
+    - Restart Zookeeper Service
 
 - name: Start and Enable Producer Service
   service:
