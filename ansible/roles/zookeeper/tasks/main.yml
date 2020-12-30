@@ -95,6 +95,12 @@
     regexp: '^log.dirs='
     line: log.dirs=/home/ec2-user/kafka_2.13-2.7.0/data/kafka
 
+- name: Line_in_File -- Modifying the server.properties
+  lineinfile:
+    path: /home/ec2-user/kafka_2.13-2.7.0/config/server.properties
+    regexp: '^#listeners=PLAINTEXT'
+    line: listeners=PLAINTEXT://localhost:9092
+
 - name: Copy -- Copying Kafka service file
   copy:
     src: kafka.service

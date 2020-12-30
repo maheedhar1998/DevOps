@@ -28,15 +28,14 @@ func getFromKafka(cons *kafka.Consumer) (string, bool) {
 	for !read {
 		fmt.Println("Reading From Kafka....")
 		tm, tmErr := time.ParseDuration("5s")
-		fmt.Println(tmErr)
+		fmt.Printf("%v, %v\n", tmErr, 31)
 		line, err := cons.ReadMessage(tm)
-		fmt.Printf("%v, %T, %v, %T", line, line, err, err)
+		fmt.Printf("%v, %T, %v, %T, %v\n", line, line, err, err, 33)
 		if err == nil {
-			return string(line.Value), true
 			read = true
+			return string(line.Value), true
 		} else {
-			fmt.Println(err)
-			return "", false
+			fmt.Printf("%v, %v\n", err, 38)
 		}
 	}
 	return "", false
@@ -73,7 +72,7 @@ func searchArtistByName(w http.ResponseWriter, r *http.Request) {
 			queriedArtists = append(queriedArtists, art)
 		}
 	}
-	fmt.Println(len(queriedArtists))
+	fmt.Printf("%v, %v\n", len(queriedArtists), 76)
 	json.NewEncoder(w).Encode(queriedArtists)
 }
 
@@ -87,7 +86,7 @@ func searchArtistByBirthYear(w http.ResponseWriter, r *http.Request) {
 			queriedArtists = append(queriedArtists, art)
 		}
 	}
-	fmt.Println(len(queriedArtists))
+	fmt.Printf("%v, %v", len(queriedArtists), 90)
 	json.NewEncoder(w).Encode(queriedArtists)
 }
 
@@ -101,7 +100,7 @@ func searchArtistByDeathYear(w http.ResponseWriter, r *http.Request) {
 			queriedArtists = append(queriedArtists, art)
 		}
 	}
-	fmt.Println(len(queriedArtists))
+	fmt.Printf("%v, %v", len(queriedArtists), 104)
 	json.NewEncoder(w).Encode(queriedArtists)
 }
 
@@ -117,7 +116,7 @@ func searchArtistByProfession(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-	fmt.Println(len(queriedArtists))
+	fmt.Printf("%v, %v", len(queriedArtists), 120)
 	json.NewEncoder(w).Encode(queriedArtists)
 }
 
@@ -139,7 +138,7 @@ func main() {
 		} else {
 			break
 		}
-		fmt.Println(len(artists), artists[0])
+		fmt.Println(len(artists), artists[0], 142)
 	}
 	c.Close()
 	// Route Handles and Endpoints

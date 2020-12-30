@@ -4,21 +4,25 @@
   service:
     name: kafka
     state: restarted
+    enabled: yes
 
 - name: Restart Zookeeper Service
   service:
     name: zookeeper
     state: restarted
+    enabled: yes
 
 - name: Restart Producer Service
   service:
     name: producer
     state: restarted
+    enabled: yes
 
 - name: Restart Docker Service
   service:
     name: docker
     state: restarted
+    enabled: yes
 
 - name: Reload Daemons
   command: /usr/bin/systemctl daemon-reload
