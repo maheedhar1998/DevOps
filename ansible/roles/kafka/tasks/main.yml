@@ -1,53 +1,53 @@
 ---
 # tasks file for kafka
-- name: Update the instance
+- name: Yum -- Update the instance
   yum:
     name: "*"
     state: latest
     update_only: yes
 
-- name: Install git, wget, go, 
+- name: Yum -- Install git, wget, go, 
   yum:
     name:
       - git
       - wget
       - go
 
-- name: check kafka binaries
+- name: Stat -- check kafka binaries
   stat:
     path: /home/ec2-user/kafka_2.13-2.7.0.tgz
   register: downloadedBinaries
 
-- name: Downloading Kafka Binaries
+- name: Get_Url -- Downloading Kafka Binaries
   get_url:
     url: https://mirror.olnevhost.net/pub/apache/kafka/2.7.0/kafka_2.13-2.7.0.tgz
     dest: /home/ec2-user
   when: downloadedBinaries.stat.exists == False
 
-- name: Extract the Kafka Binaries
+- name: Command -- Extract the Kafka Binaries
   command:
     cmd: /usr/bin/tar -xvf kafka_2.13-2.7.0.tgz
     chdir: /home/ec2-user
   when: downloadedBinaries.stat.exists == False
 
-- name: Create the neccessary directory
+- name: Command -- Create the neccessary directory
   command:
     cmd: /usr/bin/mkdir -p data/kafka data/zookeeper
     chdir: /home/ec2-user/kafka_2.13-2.7.0/
 
-- name: Modifying the server.properties log.dirs
+- name: Line_in_File -- Modifying the server.properties log.dirs
   lineinfile:
     path: /home/ec2-user/kafka_2.13-2.7.0/config/server.properties
     regexp: '^log.dirs='
     line: log.dirs=/home/ec2-user/kafka_2.13-2.7.0/data/kafka
 
-- name: Modifying the server.properties zookeeper connect server
+- name: Line_in_File -- Modifying the server.properties zookeeper connect server
   lineinfile:
     path: /home/ec2-user/kafka_2.13-2.7.0/config/server.properties
     regexp: '^zookeeper.connect='
     line: zookeeper.connect=10.11.2.159:2181
 
-- name: Installing Java enabling yum repo
+- name: Command -- Installing Java enabling yum repo
   command: /usr/bin/amazon-linux-extras enable corretto8
 
 - name: Installing Java installing
@@ -55,16 +55,10 @@
     name: java-1.8.0-amazon-corretto
     state: present
 
-- name: Copying Kafka service file
+- name: Copy -- Copying Kafka service file
   copy:
     src: kafka.service
     dest: /etc/systemd/system/kafka.service
   notify:
     - Reload Daemons
     - Restart Kafka Service
-
-- name: Start and Enable Kafka Service
-  service:
-    name: kafka
-    enabled: yes
-    state: started

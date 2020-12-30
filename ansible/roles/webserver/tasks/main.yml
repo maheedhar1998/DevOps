@@ -1,22 +1,22 @@
 ---
 # tasks file for webserver
-- name: Update the instance
+- name: Yum -- Update the instance
   yum:
     name: "*"
     state: latest
     update_only: yes
 
-- name: Install git, wget, go, 
+- name: Yum -- Install git, wget, go, 
   yum:
     name:
       - git
       - wget
       - go
 
-- name: Install Nginx
+- name: Command -- Install Nginx
   command: /usr/bin/amazon-linux-extras install nginx1 -y
 
-- name: Overwrite the Server 1 index.html file
+- name: Copy -- Overwrite the Server 1 index.html file
   copy:
     src: index_1.html
     dest: /usr/share/nginx/html/index.html
@@ -24,7 +24,7 @@
   notify:
     - Restart Nginx Service
 
-- name: Overwrite the Server 2 index.html file
+- name: Copy -- Overwrite the Server 2 index.html file
   copy:
     src: index_2.html
     dest: /usr/share/nginx/html/index.html
@@ -32,7 +32,7 @@
   notify:
     - Restart Nginx Service
 
-- name: Overwrite the Server 3 index.html file
+- name: Copy -- Overwrite the Server 3 index.html file
   copy:
     src: index_3.html
     dest: /usr/share/nginx/html/index.html
@@ -40,17 +40,17 @@
   notify:
     - Restart Nginx Service
 
-- name: Installing Necessary Go Libraries
+- name: Command -- Installing Necessary Go Libraries
   command:
     cmd: /usr/bin/go get -u -v gopkg.in/confluentinc/confluent-kafka-go.v1/kafka
     chdir: /home/ec2-user
 
-- name: Installing Necessary Go Libraries
+- name: Command -- Installing Necessary Go Libraries
   command:
     cmd: /usr/bin/go get -u -v github.com/gorilla/mux
     chdir: /home/ec2-user
 
-- name: Overwrite the Server 1 consumer.go file
+- name: Copy -- Overwrite the Server 1 consumer.go file
   copy:
     src: consumer_1.go
     dest: /home/ec2-user/consumer.go
@@ -58,7 +58,7 @@
   notify:
     - Build Consumer Go Binary
 
-- name: Overwrite the Server 2 consumer.go file
+- name: Copy -- Overwrite the Server 2 consumer.go file
   copy:
     src: consumer_2.go
     dest: /home/ec2-user/consumer.go
@@ -66,7 +66,7 @@
   notify:
     - Build Consumer Go Binary
 
-- name: Overwrite the Server 3 consumer.go file
+- name: Copy -- Overwrite the Server 3 consumer.go file
   copy:
     src: consumer_3.go
     dest: /home/ec2-user/consumer.go
@@ -74,7 +74,7 @@
   notify:
     - Build Consumer Go Binary
 
-- name: Copy the consumer servie file
+- name: Copy -- the consumer servie file
   copy:
     src: consumer.service
     dest: /etc/systemd/system/consumer.service
