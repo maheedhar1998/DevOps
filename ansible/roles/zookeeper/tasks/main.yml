@@ -1,11 +1,5 @@
 ---
 # tasks file for zookeeper
-- name: Yum -- Update the instance
-  yum:
-    name: "*"
-    state: latest
-    update_only: yes
-
 - name: Yum -- Install git, wget, go, 
   yum:
     name:
@@ -88,18 +82,16 @@
     path: /home/ec2-user/kafka_2.13-2.7.0/config/zookeeper.properties
     regexp: '^dataDir='
     line: dataDir=/home/ec2-user/kafka_2.13-2.7.0/data/zookeeper/
+  notify:
+    - Restart Zookeeper Service
 
 - name: Line_in_File -- Modifying the server.properties
   lineinfile:
     path: /home/ec2-user/kafka_2.13-2.7.0/config/server.properties
     regexp: '^log.dirs='
     line: log.dirs=/home/ec2-user/kafka_2.13-2.7.0/data/kafka
-
-- name: Line_in_File -- Modifying the server.properties
-  lineinfile:
-    path: /home/ec2-user/kafka_2.13-2.7.0/config/server.properties
-    regexp: '^#listeners=PLAINTEXT'
-    line: listeners=PLAINTEXT://localhost:9092
+  notify:
+    - Restart Kafka Service
 
 - name: Copy -- Copying Kafka service file
   copy:

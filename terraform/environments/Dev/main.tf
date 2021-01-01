@@ -254,7 +254,7 @@ module "security_group_2_rule_8" {
   type = "ingress"
   from_port = -1
   to_port = -1
-  protocol = "icmp"
+  protocol = "all"
   security_group_id = module.security_group_sub2.security_group_id
 }
 
@@ -375,7 +375,7 @@ module "ec2_zookeeper_server" {
   number_of_instances = 1
   subnet_id = module.subnet_2.subnet_id
   name = "zookeeper-server-dev"
-  instance_type = "t2.small"
+  instance_type = "t2.medium"
   vpc_security_group_ids = [module.security_group_sub2.security_group_id]
   key_name = "my-ssh-key"
   iam_instance_profile = module.iam_ec2_webserver_instance_profile.name

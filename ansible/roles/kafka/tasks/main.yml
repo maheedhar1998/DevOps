@@ -1,11 +1,5 @@
 ---
 # tasks file for kafka
-- name: Yum -- Update the instance
-  yum:
-    name: "*"
-    state: latest
-    update_only: yes
-
 - name: Yum -- Install git, wget, go, 
   yum:
     name:
@@ -40,24 +34,24 @@
     path: /home/ec2-user/kafka_2.13-2.7.0/config/server.properties
     regexp: '^log.dirs='
     line: log.dirs=/home/ec2-user/kafka_2.13-2.7.0/data/kafka
+  notify:
+    - Restart Kafka Service
 
 - name: Line_in_File -- Modifying the server.properties zookeeper connect server
   lineinfile:
     path: /home/ec2-user/kafka_2.13-2.7.0/config/server.properties
     regexp: '^zookeeper.connect='
-    line: zookeeper.connect=10.11.2.159:2181
+    line: zookeeper.connect=10.11.2.152:2181
+  notify:
+    - Restart Kafka Service
 
 - name: Line_in_File -- Modifying the server.properties
   lineinfile:
     path: /home/ec2-user/kafka_2.13-2.7.0/config/server.properties
-    regexp: '^#listeners=PLAINTEXT'
-    line: listeners=PLAINTEXT://10.11.2.152:9092
-
-- name: Line_in_File -- Modifying the server.properties
-  lineinfile:
-    path: /home/ec2-user/kafka_2.13-2.7.0/config/server.properties
-    regexp: '^broker.id=0'
+    regexp: '^broker.id='
     line: broker.id={{broker_num}}
+  notify:
+    - Restart Kafka Service
 
 - name: Command -- Installing Java enabling yum repo
   command: /usr/bin/amazon-linux-extras enable corretto8
