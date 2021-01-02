@@ -85,11 +85,27 @@
   notify:
     - Restart Zookeeper Service
 
-- name: Line_in_File -- Modifying the server.properties
+- name: Line_in_File -- Modifying the server.properties log dirs
   lineinfile:
     path: /home/ec2-user/kafka_2.13-2.7.0/config/server.properties
     regexp: '^log.dirs='
     line: log.dirs=/home/ec2-user/kafka_2.13-2.7.0/data/kafka
+  notify:
+    - Restart Kafka Service
+
+- name: Line_in_File -- Modifying the server.properties listeners
+  lineinfile:
+    path: /home/ec2-user/kafka_2.13-2.7.0/config/server.properties
+    regexp: '^listeners='
+    line: listeners=PLAINTEXT://0.0.0.0:9092
+  notify:
+    - Restart Kafka Service
+
+- name: Line_in_File -- Modifying the server.properties adv listeners
+  lineinfile:
+    path: /home/ec2-user/kafka_2.13-2.7.0/config/server.properties
+    regexp: '^advertised.listeners='
+    line: advertised.listeners=PLAINTEXT://localhost:9092
   notify:
     - Restart Kafka Service
 
