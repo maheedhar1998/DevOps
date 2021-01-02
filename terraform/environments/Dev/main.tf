@@ -129,7 +129,7 @@ module "bastion_sg_rule_4" {
   to_port = 22
   protocol = "tcp"
   security_group_id = module.security_group_bastion.security_group_id
-  cidr_blocks = ["24.211.75.252/32"]
+  cidr_blocks = ["174.99.209.66/32"]
 }
 
 module "route_table_sub_1" {
