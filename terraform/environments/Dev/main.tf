@@ -353,7 +353,7 @@ module "ec2_webserver" {
   number_of_instances = 3
   subnet_id = module.subnet_2.subnet_id
   name = "webserver-dev"
-  instance_type = "t2.micro"
+  instance_type = "t2.medium"
   vpc_security_group_ids = [module.security_group_sub2.security_group_id]
   key_name = "my-ssh-key"
   iam_instance_profile = module.iam_ec2_webserver_instance_profile.name
