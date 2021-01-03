@@ -61,24 +61,6 @@
   notify:
     - Restart Kafka Service
 
-- name: Line_in_File -- Modifying the server.properties adv listeners
-  lineinfile:
-    path: /home/ec2-user/kafka_2.13-2.7.0/config/server.properties
-    regexp: '^advertised.listeners='
-    line: advertised.listeners=PLAINTEXT://10.11.2.152:9092
-  when: broker_num == 1
-  notify:
-    - Restart Kafka Service
-
-- name: Line_in_File -- Modifying the server.properties adv listeners
-  lineinfile:
-    path: /home/ec2-user/kafka_2.13-2.7.0/config/server.properties
-    regexp: '^advertised.listeners='
-    line: advertised.listeners=PLAINTEXT://10.11.2.104:9092
-  when: broker_num == 2
-  notify:
-    - Restart Kafka Service
-
 - name: Command -- Installing Java enabling yum repo
   command: /usr/bin/amazon-linux-extras enable corretto8
 

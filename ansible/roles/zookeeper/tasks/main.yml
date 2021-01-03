@@ -101,14 +101,6 @@
   notify:
     - Restart Kafka Service
 
-- name: Line_in_File -- Modifying the server.properties adv listeners
-  lineinfile:
-    path: /home/ec2-user/kafka_2.13-2.7.0/config/server.properties
-    regexp: '^advertised.listeners='
-    line: advertised.listeners=PLAINTEXT://localhost:9092
-  notify:
-    - Restart Kafka Service
-
 - name: Copy -- Copying Kafka service file
   copy:
     src: kafka.service
