@@ -26,7 +26,7 @@
 
 - name: Command -- Create the neccessary directory
   command:
-    cmd: /usr/bin/mkdir -p data/kafka data/zookeeper
+    cmd: /usr/bin/mkdir -p data/kafka
     chdir: /home/ec2-user/kafka_2.13-2.7.0/
 
 - name: Line_in_File -- Modifying the server.properties log.dirs

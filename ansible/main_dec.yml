@@ -1,28 +1,38 @@
-- hosts: zookeeper
-  become: yes
-  become_user: root
-  roles:
-    - role: './roles/zookeeper'
-
 - hosts: kafka_host1
   become: yes
   become_user: root
   roles:
-    - role: './roles/kafka/'
+    - role: './roles/zookeeper/'
   environment:
     GOPATH: "/home/ec2-user/go"
   vars:
     broker_num: 1
+    zookeeper_host: "10.11.2.18"
+    kafka_host: "10.11.2.18"
 
 - hosts: kafka_host2
   become: yes
   become_user: root
   roles:
-    - role: './roles/kafka/'
+    - role: './roles/zookeeper/'
   environment:
     GOPATH: "/home/ec2-user/go"
   vars:
     broker_num: 2
+    zookeeper_host: "10.11.2.18"
+    kafka_host: "10.11.2.54"
+
+- hosts: kafka_host3
+  become: yes
+  become_user: root
+  roles:
+    - role: './roles/zookeeper/'
+  environment:
+    GOPATH: "/home/ec2-user/go"
+  vars:
+    broker_num: 3
+    zookeeper_host: "10.11.2.18"
+    kafka_host: "10.11.2.243"
 
 - hosts: webserver1
   become: yes

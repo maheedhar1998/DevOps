@@ -24,7 +24,7 @@ resource "aws_instance" "red_hat_instance" {
   key_name = var.key_name
   iam_instance_profile = var.iam_instance_profile
   root_block_device {
-    volume_size = 8
+    volume_size = 20
   }
   tags = {
     Name = "${var.name}-${count.index+1}"

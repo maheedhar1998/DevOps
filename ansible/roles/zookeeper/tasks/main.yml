@@ -77,45 +77,29 @@
     cmd: /usr/bin/mkdir -p data/kafka data/zookeeper
     chdir: /home/ec2-user/kafka_2.13-2.7.0/
 
-- name: Line_in_File -- Modifying the zookeeper.properties
-  lineinfile:
-    path: /home/ec2-user/kafka_2.13-2.7.0/config/zookeeper.properties
-    regexp: '^dataDir='
-    line: dataDir=/home/ec2-user/kafka_2.13-2.7.0/data/zookeeper/
+- name: Copy -- Copying Zookeeper Properties file
+  copy:
+    src: zookeeper.properties
+    dest: /home/ec2-user/kafka_2.13-2.7.0/config/zookeeper.properties
   notify:
     - Restart Zookeeper Service
 
-- name: Line_in_File -- Modifying the server.properties log dirs
-  lineinfile:
-    path: /home/ec2-user/kafka_2.13-2.7.0/config/server.properties
-    regexp: '^log.dirs='
-    line: log.dirs=/home/ec2-user/kafka_2.13-2.7.0/data/kafka
-  notify:
-    - Restart Kafka Service
-
-- name: Line_in_File -- Modifying the server.properties listeners
-  lineinfile:
-    path: /home/ec2-user/kafka_2.13-2.7.0/config/server.properties
-    regexp: '^listeners='
-    line: listeners=PLAINTEXT://0.0.0.0:9092
-  notify:
-    - Restart Kafka Service
-
-- name: Line_in_File -- Modifying the server.properties listeners
-  lineinfile:
-    path: /home/ec2-user/kafka_2.13-2.7.0/config/server.properties
-    regexp: '^advertised.listeners='
-    line: advertised.listeners=PLAINTEXT://10.11.2.152:9092
-  notify:
-    - Restart Kafka Service
-
-- name: Copy -- Copying Kafka service file
+- name: Copy -- Copying Zookeeper Config file
   copy:
-    src: kafka.service
-    dest: /etc/systemd/system/kafka.service
+    src: zoo.cfg
+    dest: /home/ec2-user/zoo.cfg
   notify:
-    - Reload Daemons
+    - Restart Zookeeper Service
+
+- name: Template -- Template a file to kafka.properties
+  template:
+    src: kafka.properties.j2
+    dest: /home/ec2-user/kafka_2.13-2.7.0/config/server.properties
+  notify:
     - Restart Kafka Service
+
+- name: Command -- Create myid file for each zookeeper node
+  command: sh -c "echo {{broker_num}} > /home/ec2-user/kafka_2.13-2.7.0/data/zookeeper/myid"
 
 - name: Copy -- Copying Zookeeper service file
   copy:
@@ -124,3 +108,11 @@
   notify:
     - Reload Daemons
     - Restart Zookeeper Service
+
+- name: Copy -- Copying Kafka service file
+  copy:
+    src: kafka.service
+    dest: /etc/systemd/system/kafka.service
+  notify:
+    - Reload Daemons
+    - Restart Kafka Service

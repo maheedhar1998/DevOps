@@ -42,3 +42,4 @@ operations/variable-scripts/variable.template.json
 operations/variable-scripts/variable.json
 # Data files
 *.tsv.gz
+*_secret.yml
