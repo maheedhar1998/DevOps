@@ -16,33 +16,16 @@
 - name: Command -- Install Nginx
   command: /usr/bin/amazon-linux-extras install nginx1 -y
 
-- name: Copy -- Overwrite the Server 1 index.html file
-  copy:
-    src: index_1.html
+- name: Template -- Overwrite the Server 1 index.html file
+  template:
+    src: index.html.j2
     dest: /usr/share/nginx/html/index.html
-  when: webserver_num == 1
-  notify:
-    - Restart Nginx Service
-
-- name: Copy -- Overwrite the Server 2 index.html file
-  copy:
-    src: index_2.html
-    dest: /usr/share/nginx/html/index.html
-  when: webserver_num == 2
-  notify:
-    - Restart Nginx Service
-
-- name: Copy -- Overwrite the Server 3 index.html file
-  copy:
-    src: index_3.html
-    dest: /usr/share/nginx/html/index.html
-  when: webserver_num == 3
   notify:
     - Restart Nginx Service
 
 - name: Command -- Installing Necessary Go Libraries
   command:
-    cmd: /usr/bin/go get -u -v gopkg.in/confluentinc/confluent-kafka-go.v1/kafka
+    cmd: /usr/bin/go get -u -v github.com/confluentinc/confluent-kafka-go/kafka
     chdir: /home/ec2-user
 
 - name: Command -- Installing Necessary Go Libraries
@@ -50,29 +33,10 @@
     cmd: /usr/bin/go get -u -v github.com/gorilla/mux
     chdir: /home/ec2-user
 
-- name: Copy -- Overwrite the Server 1 consumer.go file
-  copy:
-    src: consumer_1.go
+- name: Template -- Overwrite the Server 1 consumer.go file
+  template:
+    src: consumer.go.j2
     dest: /home/ec2-user/consumer.go
-  when: webserver_num == 1
-  notify:
-    - Build Consumer Go Binary
-    - Restart Consumer Service
-
-- name: Copy -- Overwrite the Server 2 consumer.go file
-  copy:
-    src: consumer_2.go
-    dest: /home/ec2-user/consumer.go
-  when: webserver_num == 2
-  notify:
-    - Build Consumer Go Binary
-    - Restart Consumer Service
-
-- name: Copy -- Overwrite the Server 3 consumer.go file
-  copy:
-    src: consumer_3.go
-    dest: /home/ec2-user/consumer.go
-  when: webserver_num == 3
   notify:
     - Build Consumer Go Binary
     - Restart Consumer Service

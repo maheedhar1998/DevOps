@@ -41,6 +41,7 @@
     - role: './roles/webserver/'
   vars:
     webserver_num: 1
+    kafka_host: "10.11.2.18"
 
 - hosts: webserver2
   become: yes
@@ -49,6 +50,7 @@
     - role: './roles/webserver/'
   vars:
     webserver_num: 2
+    kafka_host: "10.11.2.18"
 
 - hosts: webserver3
   become: yes
@@ -57,6 +59,7 @@
     - role: './roles/webserver/'
   vars:
     webserver_num: 3
+    kafka_host: "10.11.2.18"
 
 - hosts: bastion
   become: yes

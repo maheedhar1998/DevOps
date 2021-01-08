@@ -7,7 +7,7 @@ import (
 	"os"
 	"bytes"
 
-	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
 func getNextBlock(fileReader *bufio.Reader) ([]byte, bool) {

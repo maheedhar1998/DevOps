@@ -43,7 +43,7 @@
     dest: /home/ec2-user/producer.go
 
 - name: Command -- Installing necessary go libraries
-  command: /usr/bin/go get -u -v gopkg.in/confluentinc/confluent-kafka-go.v1/kafka
+  command: /usr/bin/go get -u -v github.com/confluentinc/confluent-kafka-go/kafka
 
 - name: Command -- Building Go script binary
   command:
