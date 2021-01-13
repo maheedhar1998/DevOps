@@ -1,13 +1,13 @@
 data "aws_ami" "Red_Hat" {
-  owners = ["amazon"]
   most_recent = true
+  owners = ["amazon"]
   filter {
     name = "virtualization-type"
     values = ["hvm"]
   }
-  filter {
-    name = "name"
-    values = ["amzn2-ami*"]
+   filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-ebs"]
   }
   filter {
     name = "architecture"
@@ -24,7 +24,8 @@ resource "aws_instance" "red_hat_instance" {
   key_name = var.key_name
   iam_instance_profile = var.iam_instance_profile
   root_block_device {
-    volume_size = 20
+    volume_size = 8
+    volume_type = "gp2"
   }
   tags = {
     Name = "${var.name}-${count.index+1}"

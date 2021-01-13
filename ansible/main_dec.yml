@@ -7,8 +7,8 @@
     GOPATH: "/home/ec2-user/go"
   vars:
     broker_num: 1
-    zookeeper_host: "10.11.2.18"
-    kafka_host: "10.11.2.18"
+    zookeeper_host: "10.11.2.126"
+    kafka_host: "10.11.2.126"
 
 - hosts: kafka_host2
   become: yes
@@ -19,8 +19,8 @@
     GOPATH: "/home/ec2-user/go"
   vars:
     broker_num: 2
-    zookeeper_host: "10.11.2.18"
-    kafka_host: "10.11.2.54"
+    zookeeper_host: "10.11.2.126"
+    kafka_host: "10.11.2.76"
 
 - hosts: kafka_host3
   become: yes
@@ -31,8 +31,8 @@
     GOPATH: "/home/ec2-user/go"
   vars:
     broker_num: 3
-    zookeeper_host: "10.11.2.18"
-    kafka_host: "10.11.2.243"
+    zookeeper_host: "10.11.2.126"
+    kafka_host: "10.11.2.170"
 
 - hosts: webserver1
   become: yes
@@ -41,7 +41,7 @@
     - role: './roles/webserver/'
   vars:
     webserver_num: 1
-    kafka_host: "10.11.2.18"
+    kafka_host: "10.11.2.126"
 
 - hosts: webserver2
   become: yes
@@ -50,7 +50,7 @@
     - role: './roles/webserver/'
   vars:
     webserver_num: 2
-    kafka_host: "10.11.2.18"
+    kafka_host: "10.11.2.126"
 
 - hosts: webserver3
   become: yes
@@ -59,7 +59,7 @@
     - role: './roles/webserver/'
   vars:
     webserver_num: 3
-    kafka_host: "10.11.2.18"
+    kafka_host: "10.11.2.126"
 
 - hosts: bastion
   become: yes
